@@ -16,8 +16,7 @@ config :elixir, ansi_enabled: true # mix messages in colors
 
 config :io_ansi_table, headers: [
   # "station_id", "latitude", "weather", "temperature_string", "wind_mph",
-  # "station_id", "weather", "temperature_string", "wind_mph",
-  "station_id", "temperature_string", "wind_mph",
+  "station_id", "weather", "temperature_string", "wind_mph",
   # "location", "observation_time_rfc822"
   "location"
 ]
@@ -31,8 +30,8 @@ config :io_ansi_table, header_fixes: %{
 config :io_ansi_table, key_headers: ["temperature_string", "wind_mph"]
 
 config :io_ansi_table, margins: [
-  top:    1, # line(s) before table
-  bottom: 1, # line(s) after table
+  top:    0, # line(s) before table
+  bottom: 0, # line(s) after table
   left:   1  # space(s) left of table
 ]
 
