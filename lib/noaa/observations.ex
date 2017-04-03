@@ -21,7 +21,7 @@ defmodule NOAA.Observations do
 
   ## Options
 
-    - `:url_templates` - defaults to config value `:url_templates`
+    - `:url_templates` - defaults to config value `:url_templates` (map)
 
   ## Examples
 
@@ -61,7 +61,7 @@ defmodule NOAA.Observations do
       alias NOAA.Observations
       app = Mix.Project.config[:app]
       url_templates = Application.get_env(app, :url_templates)
-      NOAA.Observations.stations("vt", url_templates)
+      Observations.stations("vt", url_templates)
   """
   @spec stations(String.t, map) :: {:ok, [String.t]} | {:error, String.t}
   def stations(state, %{state: url_template}) do
@@ -102,7 +102,7 @@ defmodule NOAA.Observations do
       alias NOAA.Observations
       app = Mix.Project.config[:app]
       url_templates = Application.get_env(app, :url_templates)
-      NOAA.Observations.observation("KBTV", url_templates)
+      Observations.observation("KBTV", url_templates)
   """
   @spec observation(String.t, map) :: {:ok, map} | {:error, String.t}
   def observation(station, %{station: url_template}) do

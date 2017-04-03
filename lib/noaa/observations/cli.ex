@@ -5,7 +5,7 @@ defmodule NOAA.Observations.CLI do
   @moduledoc """
   Handles the command line parsing and the dispatch to
   the various functions that end up generating a table
-  of the observations from the NOAA Weather Service.
+  of observations from the NOAA Weather Service.
   """
 
   alias IO.ANSI.Table.Formatter
