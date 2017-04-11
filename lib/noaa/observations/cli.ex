@@ -14,12 +14,13 @@ defmodule NOAA.Observations.CLI do
 
   @type parsed :: {String.t, integer, boolean, atom} | :help
 
-  @app      Mix.Project.config[:app]
-  @aliases  Application.get_env(@app, :aliases)
-  @count    Application.get_env(@app, :default_count)
-  @escript  Mix.Local.name_for(:escript, Mix.Project.config)
-  @strict   Application.get_env(@app, :strict)
-  @switches Application.get_env(@app, :default_switches)
+  @app        Mix.Project.config[:app]
+  @aliases    Application.get_env(@app, :aliases)
+  @count      Application.get_env(@app, :default_count)
+  @escript    Mix.Local.name_for(:escript, Mix.Project.config)
+  @help_attrs Application.get_env(@app, :help_attrs)
+  @strict     Application.get_env(@app, :strict)
+  @switches   Application.get_env(@app, :default_switches)
 
   @doc """
   Parses and processes the command line arguments.
@@ -56,25 +57,70 @@ defmodule NOAA.Observations.CLI do
     #   escript no fl -blt light
     # Examples of usage on macOS:
     #   ./issues no il
-    prefix = case :os.type do
-      {:win32, _} -> "usage: escript #{@escript}"
-      ___________ -> "usage: ./#{@escript}"
+    {types, texts} = case :os.type do
+      {:win32, _} ->
+        { [:section, :normal, :command, :normal],
+          ["usage:", " ", "escript", " #{@escript}"]
+        }
+      _ -> # e.g. {:unix, _}
+        { [:section, :normal],
+          ["usage:", " ./#{@escript}"]
+        }
     end
-    filler = String.duplicate "\s", String.length(prefix)
-    line_1 = "[(-h | --help)] <us-state-code>"
-    line_2 = "[(-l | --last)] <count> [(-b | --bell)]"
-    line_3 = "[(-t | --table-style)=<table-style>]"
+    filler = String.duplicate " ", String.length Enum.join(texts)
+    prefix = help_format(types, texts)
+    line_1 = help_format(
+      [:switch, :arg],
+      ["[(-h | --help)] ", "<us-state-code>"]
+    )
+    line_2 = help_format(
+      [:switch, :normal, :arg, :normal, :switch],
+      ["[(-l | --last)]", " ", "<count>", " ", "[(-b | --bell)]"]
+    )
+    line_3 = help_format(
+      [:switch, :arg, :switch],
+      ["[(-t | --table-style)=", "<table-style>", "]"]
+    )
+    line_4 = help_format(
+      [:section],
+      ["where:"]
+    )
+    line_5 = help_format(
+      [:normal, :arg, :normal],
+      ["  - default ", "<count>", " is #{@count}"]
+    )
+    line_6 = help_format(
+      [:normal, :arg, :normal, :value],
+      ["  - default ", "<table-style>", " is ", "#{@switches[:table_style]}"]
+    )
+    line_7 = help_format(
+      [:normal, :arg, :normal],
+      ["  - ", "<table-style>", " is one of:"]
+    )
     IO.write """
       #{prefix} #{line_1}
       #{filler} #{line_2}
       #{filler} #{line_3}
-      where:
-        - default <count> is #{@count}
-        - default <table-style> is #{@switches[:table_style]}
-        - <table-style> is one of:
+      #{line_4}
+      #{line_5}
+      #{line_6}
+      #{line_7}
       """
-    Style.texts "\s\s\s\s• &tag&filler - &note", &IO.puts/1
+    template = help_format(
+      [:normal, :value, :normal],
+      ["\s\s\s\s• ", "&tag", "&filler - &note"]
+    )
+    Style.texts "#{template}", &IO.puts/1
     System.halt(0)
+  end
+
+  @spec help_format([atom], [String.t]) :: maybe_improper_list
+  defp help_format(types, texts) do
+    types
+    |> Enum.map(&@help_attrs[&1])
+    |> Enum.zip(texts)
+    |> Enum.map(&Tuple.to_list/1)
+    |> IO.ANSI.format
   end
 
   @doc """

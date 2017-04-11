@@ -22,9 +22,9 @@ config :io_ansi_table, headers: [
 ]
 
 config :io_ansi_table, header_fixes: %{
-  ~r[\sid$]i       => "\sID",
-  ~r[\smph$]i      => "\sMPH",
-  ~r[\srfc(\d+)$]i => "\sRFC-\\1"
+  ~r[ id$]i       => " ID",
+  ~r[ mph$]i      => " MPH",
+  ~r[ rfc(\d+)$]i => " RFC-\\1"
 }
 
 config :io_ansi_table, key_headers: ["temperature_string", "wind_mph"]
@@ -46,6 +46,15 @@ config :noaa_observations, default_count: 13
 config :noaa_observations, default_switches: [
   help: false, last: false, bell: false, table_style: "dark"
 ]
+
+config :noaa_observations, help_attrs: %{
+  arg:     :light_cyan,
+  command: :light_yellow,
+  normal:  :reset,
+  section: :light_green,
+  switch:  :light_black,
+  value:   :light_magenta
+}
 
 config :noaa_observations, strict: [
   help: :boolean, last: :boolean, bell: :boolean, table_style: :string

@@ -2,9 +2,8 @@ defmodule NOAA.Observations.Mixfile do
   use Mix.Project
 
   def project do
-    [
-      app: :noaa_observations,
-      version: "0.1.0",
+    [ app: :noaa_observations,
+      version: "0.1.1",
       elixir: "~> 1.4",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -29,8 +28,7 @@ defmodule NOAA.Observations.Mixfile do
   end
 
   defp package do
-    [
-      maintainers: ["Raymond Loranger"],
+    [ maintainers: ["Raymond Loranger"],
       licenses: ["MIT"],
       links: %{"GitHub" => source_url()}
     ]
@@ -54,8 +52,8 @@ defmodule NOAA.Observations.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [
-      {:io_ansi_table, "~> 0.1", app: false},
+    [ {:io_ansi_table, "~> 0.1"},
+      # {:io_ansi_table, "~> 0.1", app: false},
       {:earmark, "~> 1.0", only: :dev},
       {:ex_doc, "~> 0.14", only: :dev, runtime: false},
       {:httpoison, "~> 0.11"},

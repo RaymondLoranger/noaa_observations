@@ -18,7 +18,7 @@ Then run these commands to build the escript:
 
 Now you can run the application like so on Windows:
 
-  - escript no --help
+  - escript no --help (now in colors)
   - escript no ny 9 --last --table-style=dark
 
 On macOS, you would run the application as follows:
