@@ -53,12 +53,9 @@ defmodule NOAA.Observations.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [ {:io_ansi_table, "~> 0.1"},
-      # {:io_ansi_table, "~> 0.1", app: false},
       {:earmark, "~> 1.0", only: :dev},
       {:ex_doc, "~> 0.14", only: :dev, runtime: false},
       {:httpoison, "~> 0.11"},
-      # {:dialyxir, "~> 0.4", only: :dev, runtime: false}
-      # {:dialyxir, "== 0.4.3", only: :dev, runtime: false}
       {:dialyxir, "== 0.4.4", only: :dev, runtime: false}
     ]
   end
@@ -68,9 +65,9 @@ defmodule NOAA.Observations.Mixfile do
   end
 
   defp copy_images(_) do
-    File.cp_r "images", "doc/images", fn src, dst ->
-      IO.gets(~s|Overwriting "#{dst}" with "#{src}".\nProceed? [Yn]\s|)
-      in ["y\n", "Y\n"]
+    File.cp_r "images", "doc/images", fn src, dst -> src || dst # => true
+      # IO.gets(~s|Overwriting "#{dst}" with "#{src}".\nProceed? [Yn]\s|)
+      # in ["y\n", "Y\n"]
     end
   end
 
