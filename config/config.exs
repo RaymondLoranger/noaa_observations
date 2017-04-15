@@ -20,33 +20,34 @@ config :io_ansi_table, headers: [
   # "location", "observation_time_rfc822"
   "location"
 ]
-
 config :io_ansi_table, header_fixes: %{
   ~r[ id$]i       => " ID",
   ~r[ mph$]i      => " MPH",
   ~r[ rfc(\d+)$]i => " RFC-\\1"
 }
-
 config :io_ansi_table, key_headers: ["temperature_string", "wind_mph"]
-
 config :io_ansi_table, margins: [
   top:    0, # line(s) before table
   bottom: 0, # line(s) after table
   left:   1  # space(s) left of table
 ]
 
-config :logger, compile_time_purge_level: :info
+config :logger, backends: [
+  :console, {LoggerFileBackend, :error}, {LoggerFileBackend, :info}
+]
+config :logger, compile_time_purge_level: :info # purges debug messages
+config :logger, :console,
+  colors: [debug: :light_cyan, warn: :light_yellow, error: :light_red]
+config :logger, :error, path: "./log/error.log", level: :error
+config :logger, :info, path: "./log/info.log", level: :info
 
 config :noaa_observations, aliases: [
   h: :help, l: :last, b: :bell, t: :table_style
 ]
-
 config :noaa_observations, default_count: 13
-
 config :noaa_observations, default_switches: [
   help: false, last: false, bell: false, table_style: "dark"
 ]
-
 config :noaa_observations, help_attrs: %{
   arg:     :light_cyan,
   command: :light_yellow,
@@ -55,11 +56,9 @@ config :noaa_observations, help_attrs: %{
   switch:  :light_black,
   value:   :light_magenta
 }
-
 config :noaa_observations, strict: [
   help: :boolean, last: :boolean, bell: :boolean, table_style: :string
 ]
-
 config :noaa_observations, url_templates: %{
   state: "http://w1.weather.gov/xml/current_obs/" <>
     "seek.php?state={st}&Find=Find",

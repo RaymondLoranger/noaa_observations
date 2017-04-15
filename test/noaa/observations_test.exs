@@ -9,7 +9,7 @@ defmodule NOAA.ObservationsTest do
   doctest Observations
 
   setup_all do
-    Logger.configure level: :error # prevents info logging
+    Logger.configure level: :error # prevents info messages
   end
 
   describe "NOAA.Observations.fetch/2" do

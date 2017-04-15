@@ -8,8 +8,9 @@ defmodule NOAA.Observations.CLI do
   of observations from the NOAA Weather Service.
   """
 
-  alias IO.ANSI.Table.Formatter
-  alias IO.ANSI.Table.Style
+  import Logger, only: [error: 1]
+
+  alias IO.ANSI.Table.{Formatter, Style}
   alias NOAA.Observations
 
   @type parsed :: {String.t, integer, boolean, atom} | :help
@@ -36,13 +37,14 @@ defmodule NOAA.Observations.CLI do
       Formatter.print_table(observations, count, bell, style)
     else
       :help -> help()
-      {:error, text} -> report_error(text)
+      {:error, text} -> log_error(text)
     end
   end
 
-  @spec report_error(String.t) :: no_return
-  defp report_error(text) do
-    IO.puts "Error fetching from NOAA - #{text}"
+  @spec log_error(String.t) :: no_return
+  defp log_error(text) do
+    error "Error fetching from NOAA - #{text}"
+    Process.sleep(1_000) # ensure message logged before exiting
     System.halt(2)
   end
 

@@ -6,6 +6,8 @@ defmodule NOAA.Observations do
   Fetches a list of weather observations from a US state/territory.
   """
 
+  import Logger, only: [info: 1]
+
   @app           Mix.Project.config[:app]
   @url_templates Application.get_env(@app, :url_templates)
 
@@ -30,11 +32,10 @@ defmodule NOAA.Observations do
   """
   @spec fetch(String.t, Keyword.t) :: {:ok, [map]} | {:error, String.t}
   def fetch(state, options \\ []) do
-    require Logger
-    Logger.info "Fetching NOAA Observations from state/territory: #{state}..."
+    info "Fetching NOAA Observations from state/territory: #{state}..."
     with url_templates <- Keyword.get(options, :url_templates, @url_templates),
-          url_templates <- Map.merge(@url_templates, url_templates),
-          {:ok, stations} <- stations(state, url_templates) do
+        url_templates <- Map.merge(@url_templates, url_templates),
+        {:ok, stations} <- stations(state, url_templates) do
       stations
       |> Enum.map(&observation &1, url_templates)
       |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
