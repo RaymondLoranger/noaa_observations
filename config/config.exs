@@ -31,6 +31,7 @@ config :io_ansi_table, margins: [
   bottom: 0, # line(s) after table
   left:   1  # space(s) left of table
 ]
+config :io_ansi_table, max_width: 88
 
 config :logger, backends: [
   :console, {LoggerFileBackend, :error}, {LoggerFileBackend, :info}

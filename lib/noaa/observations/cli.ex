@@ -33,7 +33,8 @@ defmodule NOAA.Observations.CLI do
   @spec main([String.t]) :: :ok | no_return
   def main(argv) do
     with {state, count, bell, style} <- parse(argv),
-        {:ok, observations} <- Observations.fetch(state) do
+      {:ok, observations} <- Observations.fetch(state)
+    do
       Formatter.print_table(observations, count, bell, style)
     else
       :help -> help()
@@ -179,10 +180,10 @@ defmodule NOAA.Observations.CLI do
   @spec reformat({Keyword.t, [String.t], [tuple]}) :: parsed
   defp reformat({switches, args, []}) do
     with {state, count} <- normalize(args),
-        %{
-          help: false, last: last, bell: bell, table_style: table_style
-        } <- Map.merge(Map.new(@switches), Map.new(switches)),
-        {:ok, style} <- Style.style_for(table_style) do
+      %{help: false, last: last, bell: bell, table_style: table_style}
+      <- Map.merge(Map.new(@switches), Map.new(switches)),
+      {:ok, style} <- Style.style_for(table_style)
+    do
       {state, last && -count || count, bell, style}
     else
       _ -> :help

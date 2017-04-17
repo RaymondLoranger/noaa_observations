@@ -34,8 +34,9 @@ defmodule NOAA.Observations do
   def fetch(state, options \\ []) do
     info "Fetching NOAA Observations from state/territory: #{state}..."
     with url_templates <- Keyword.get(options, :url_templates, @url_templates),
-        url_templates <- Map.merge(@url_templates, url_templates),
-        {:ok, stations} <- stations(state, url_templates) do
+      url_templates <- Map.merge(@url_templates, url_templates),
+      {:ok, stations} <- stations(state, url_templates)
+    do
       stations
       |> Enum.map(&observation &1, url_templates)
       |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
@@ -68,9 +69,9 @@ defmodule NOAA.Observations do
   def stations(state, %{state: url_template}) do
     try do
       with url <- url(url_template, state: state),
-          {:ok, %{status_code: 200, body: body}} <- HTTPoison.get(url) do
-        {
-          :ok,
+        {:ok, %{status_code: 200, body: body}} <- HTTPoison.get(url)
+      do
+        { :ok,
           # <a href="display.php?stid=(KCDA)">Caledonia County Airport</a>
           ~r[<a href=".*?stid=(.*?)">.*?</a>] # capture station ID
           |> Regex.scan(body, capture: :all_but_first) # i.e. only subpattern
@@ -109,9 +110,9 @@ defmodule NOAA.Observations do
   def observation(station, %{station: url_template}) do
     try do
       with url <- url(url_template, station: station),
-          {:ok, %{status_code: 200, body: body}} <- HTTPoison.get(url) do
-        {
-          :ok,
+        {:ok, %{status_code: 200, body: body}} <- HTTPoison.get(url)
+      do
+        { :ok,
           # <(weather)>(Fog)</weather>
           ~r{<([^/][^>]+)>(.*?)</\1>} # capture XML tag and value
           |> Regex.scan(body, capture: :all_but_first) # i.e. only subpatterns
