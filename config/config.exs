@@ -31,7 +31,7 @@ config :io_ansi_table, margins: [
   bottom: 0, # line(s) after table
   left:   1  # space(s) left of table
 ]
-config :io_ansi_table, max_width: 88
+# config :io_ansi_table, max_width: 88
 
 config :logger, backends: [
   :console, {LoggerFileBackend, :error}, {LoggerFileBackend, :info}
@@ -43,11 +43,11 @@ config :logger, :error, path: "./log/error.log", level: :error
 config :logger, :info, path: "./log/info.log", level: :info
 
 config :noaa_observations, aliases: [
-  h: :help, l: :last, b: :bell, t: :table_style
+  h: :help, l: :last, b: :bell, t: :table_style, m: :max_width
 ]
 config :noaa_observations, default_count: 13
 config :noaa_observations, default_switches: [
-  help: false, last: false, bell: false, table_style: "dark"
+  help: false, last: false, bell: false, table_style: "dark", max_width: 88
 ]
 config :noaa_observations, help_attrs: %{
   arg:     :light_cyan,
@@ -58,7 +58,8 @@ config :noaa_observations, help_attrs: %{
   value:   :light_magenta
 }
 config :noaa_observations, strict: [
-  help: :boolean, last: :boolean, bell: :boolean, table_style: :string
+  help: :boolean, last: :boolean, bell: :boolean, table_style: :string,
+  max_width: :integer
 ]
 config :noaa_observations, url_templates: %{
   state: "http://w1.weather.gov/xml/current_obs/" <>

@@ -13,7 +13,7 @@ defmodule NOAA.Observations.CLI do
   alias IO.ANSI.Table.{Formatter, Style}
   alias NOAA.Observations
 
-  @type parsed :: {String.t, integer, boolean, atom} | :help
+  @type parsed :: {String.t, integer, boolean, atom, integer} | :help
 
   @app        Mix.Project.config[:app]
   @aliases    Application.get_env(@app, :aliases)
@@ -32,10 +32,12 @@ defmodule NOAA.Observations.CLI do
   """
   @spec main([String.t]) :: :ok | no_return
   def main(argv) do
-    with {state, count, bell, style} <- parse(argv),
+    with {state, count, bell, style, max_width} <- parse(argv),
       {:ok, observations} <- Observations.fetch(state)
     do
-      Formatter.print_table(observations, count, bell, style)
+      Formatter.print_table(
+        observations, count, bell, style, max_width: max_width
+      )
     else
       :help -> help()
       {:error, text} -> log_error(text)
@@ -54,6 +56,7 @@ defmodule NOAA.Observations.CLI do
     # Examples of usage on Windows:
     #   escript no --help
     #   escript no vt 7 --last
+    #   escript no vt 7 --last --max-width=40
     #   escript no tx --bell
     #   escript no ny -lb 8 -t GREEN
     #   escript no ca -bl 9 --table-style=medium
@@ -72,42 +75,52 @@ defmodule NOAA.Observations.CLI do
     end
     filler = String.duplicate " ", String.length Enum.join(texts)
     prefix = help_format(types, texts)
-    line_1 = help_format(
+    line_us_state_code = help_format(
       [:switch, :arg],
       ["[(-h | --help)] ", "<us-state-code>"]
     )
-    line_2 = help_format(
+    line_count = help_format(
       [:switch, :normal, :arg, :normal, :switch],
       ["[(-l | --last)]", " ", "<count>", " ", "[(-b | --bell)]"]
     )
-    line_3 = help_format(
+    line_table_style = help_format(
       [:switch, :arg, :switch],
       ["[(-t | --table-style)=", "<table-style>", "]"]
     )
-    line_4 = help_format(
+    line_max_width = help_format(
+      [:switch, :arg, :switch],
+      ["[(-m | --max-width)=", "<max-width>", "]"]
+    )
+    line_where = help_format(
       [:section],
       ["where:"]
     )
-    line_5 = help_format(
-      [:normal, :arg, :normal],
-      ["  - default ", "<count>", " is #{@count}"]
+    line_default_count = help_format(
+      [:normal, :arg, :normal, :value],
+      ["  - default ", "<count>", " is ", "#{@count}"]
     )
-    line_6 = help_format(
+    line_default_table_style = help_format(
       [:normal, :arg, :normal, :value],
       ["  - default ", "<table-style>", " is ", "#{@switches[:table_style]}"]
     )
-    line_7 = help_format(
+    line_default_max_width = help_format(
+      [:normal, :arg, :normal, :value],
+      ["  - default ", "<max-width>", " is ", "#{@switches[:max_width]}"]
+    )
+    line_table_style_one_of = help_format(
       [:normal, :arg, :normal],
       ["  - ", "<table-style>", " is one of:"]
     )
     IO.write """
-      #{prefix} #{line_1}
-      #{filler} #{line_2}
-      #{filler} #{line_3}
-      #{line_4}
-      #{line_5}
-      #{line_6}
-      #{line_7}
+      #{prefix} #{line_us_state_code}
+      #{filler} #{line_count}
+      #{filler} #{line_table_style}
+      #{filler} #{line_max_width}
+      #{line_where}
+      #{line_default_count}
+      #{line_default_table_style}
+      #{line_default_max_width}
+      #{line_table_style_one_of}
       """
     template = help_format(
       [:normal, :value, :normal],
@@ -135,8 +148,8 @@ defmodule NOAA.Observations.CLI do
   last _n_ observations, specify switch `--last` which will return a
   negative count.
 
-  Returns either a tuple of `{state, count, bell, style}` or `:help`
-  if `--help` was given.
+  Returns either a tuple of `{state, count, bell, style, max_width}`
+  or `:help` if `--help` was given.
 
   ## Parameters
 
@@ -148,6 +161,7 @@ defmodule NOAA.Observations.CLI do
     - `-l` or `--last`        - to format the last _n_ observations
     - `-b` or `--bell`        - to ring the bell
     - `-t` or `--table-style` - to apply a specific table style
+    - `-m` or `--max-width`   - to cap column widths
 
   ## Table styles
 
@@ -160,15 +174,15 @@ defmodule NOAA.Observations.CLI do
 
       iex> alias NOAA.Observations.CLI
       iex> CLI.parse(["vt", "99"])
-      {"vt", 99, false, :dark}
+      {"vt", 99, false, :dark, 88}
 
       iex> alias NOAA.Observations.CLI
       iex> CLI.parse(["TX", "88", "--last", "--bell"])
-      {"tx", -88, true, :dark}
+      {"tx", -88, true, :dark, 88}
 
       iex> alias NOAA.Observations.CLI
       iex> CLI.parse(["nc", "6", "--table-style", "cyan"])
-      {"nc", 6, false, :cyan}
+      {"nc", 6, false, :cyan, 88}
   """
   @spec parse([String.t]) :: parsed
   def parse(argv) do
@@ -180,11 +194,12 @@ defmodule NOAA.Observations.CLI do
   @spec reformat({Keyword.t, [String.t], [tuple]}) :: parsed
   defp reformat({switches, args, []}) do
     with {state, count} <- normalize(args),
-      %{help: false, last: last, bell: bell, table_style: table_style}
-      <- Map.merge(Map.new(@switches), Map.new(switches)),
+      %{help: false, last: last, bell: bell, table_style: table_style,
+        max_width: max_width
+      } <- Map.merge(Map.new(@switches), Map.new(switches)),
       {:ok, style} <- Style.style_for(table_style)
     do
-      {state, last && -count || count, bell, style}
+      {state, last && -count || count, bell, style, max_width}
     else
       _ -> :help
     end
