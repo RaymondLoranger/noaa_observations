@@ -24,7 +24,7 @@ defmodule NOAA.Observations.CLI do
   @switches   Application.get_env(@app, :default_switches)
 
   @doc """
-  Parses and processes the command line arguments.
+  Parses and processes the `command line arguments`.
 
   ## Parameters
 
@@ -140,7 +140,7 @@ defmodule NOAA.Observations.CLI do
   end
 
   @doc """
-  Parses the command line arguments.
+  Parses the `command line arguments`.
 
   `argv` can be `-h` or `--help`, which returns `:help`. Otherwise it
   is a US state/territory code (case-insensitive) and optionally the
