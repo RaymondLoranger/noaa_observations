@@ -37,8 +37,11 @@ config :logger, backends: [
   :console, {LoggerFileBackend, :error}, {LoggerFileBackend, :info}
 ]
 config :logger, compile_time_purge_level: :info # purges debug messages
-config :logger, :console,
-  colors: [debug: :light_cyan, warn: :light_yellow, error: :light_red]
+config :logger, :console, colors: [
+  debug: :light_cyan, info: :light_green,
+  warn: :light_yellow, error: :light_red
+]
+config :logger, :console, format: "$date $time [$level] $levelpad$message\n"
 config :logger, :error, path: "./log/error.log", level: :error
 config :logger, :info, path: "./log/info.log", level: :info
 

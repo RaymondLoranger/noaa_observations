@@ -13,7 +13,9 @@ defmodule NOAA.Observations.CLI do
   alias IO.ANSI.Table.{Formatter, Style}
   alias NOAA.Observations
 
-  @type parsed :: {String.t, integer, boolean, atom, integer} | :help
+  @type parsed ::
+    {String.t, integer, boolean, Style.t, Formatter.column_width}
+    | :help
 
   @app        Mix.Project.config[:app]
   @aliases    Application.get_env(@app, :aliases)
@@ -148,7 +150,8 @@ defmodule NOAA.Observations.CLI do
   last _n_ observations, specify switch `--last` which will return a
   negative count.
 
-  Returns either a tuple of `{state, count, bell, style, max_width}`
+  Returns either a tuple of
+  `{state, count, bell, table_style, max_width}`
   or `:help` if `--help` was given.
 
   ## Parameters
