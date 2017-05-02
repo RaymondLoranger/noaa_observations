@@ -34,7 +34,7 @@ config :io_ansi_table, margins: [
 # config :io_ansi_table, max_width: 88
 
 config :logger, backends: [
-  :console, {LoggerFileBackend, :error}, {LoggerFileBackend, :info}
+  :console, {LoggerFileBackend, :error_log}, {LoggerFileBackend, :info_log}
 ]
 config :logger, compile_time_purge_level: :info # purges debug messages
 config :logger, :console, colors: [
@@ -42,8 +42,10 @@ config :logger, :console, colors: [
   warn: :light_yellow, error: :light_red
 ]
 config :logger, :console, format: "$date $time [$level] $levelpad$message\n"
-config :logger, :error, path: "./log/error.log", level: :error
-config :logger, :info, path: "./log/info.log", level: :info
+config :logger, :error_log, format: "$date $time [$level] $levelpad$message\n"
+config :logger, :error_log, path: "./log/error.log", level: :error
+config :logger, :info_log, format: "$date $time [$level] $levelpad$message\n"
+config :logger, :info_log, path: "./log/info.log", level: :info
 
 config :noaa_observations, aliases: [
   h: :help, l: :last, b: :bell, t: :table_style, m: :max_width
