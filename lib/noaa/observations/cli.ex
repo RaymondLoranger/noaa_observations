@@ -13,11 +13,10 @@ defmodule NOAA.Observations.CLI do
   alias IO.ANSI.Table.{Formatter, Style}
   alias NOAA.Observations
 
-  @type bell? :: boolean
+  @type bell :: boolean
   @type count :: integer
-  @type state :: String.t
   @type parsed ::
-    {state, count, bell?, Style.t, Formatter.column_width}
+    {Observations.state, count, bell, Style.t, Formatter.column_width}
     | :help
 
   @app        Mix.Project.config[:app]
@@ -37,11 +36,11 @@ defmodule NOAA.Observations.CLI do
   """
   @spec main([String.t]) :: :ok | no_return
   def main(argv) do
-    with {state, count, bell?, style, max_width} <- parse(argv),
+    with {state, count, bell, style, max_width} <- parse(argv),
       {:ok, observations} <- Observations.fetch(state)
     do
       Formatter.print_table(
-        observations, count, bell?, style, max_width: max_width
+        observations, count, bell, style, max_width: max_width
       )
     else
       :help -> help()
@@ -154,7 +153,7 @@ defmodule NOAA.Observations.CLI do
   negative count.
 
   Returns either a tuple of
-  `{state, count, bell?, table_style, max_width}`
+  `{state, count, bell, table_style, max_width}`
   or `:help` if `--help` was given.
 
   ## Parameters
@@ -200,19 +199,19 @@ defmodule NOAA.Observations.CLI do
   @spec reformat({Keyword.t, [String.t], [tuple]}) :: parsed
   defp reformat {switches, args, []} do
     with {state, count} <- normalize(args),
-      %{help: false, last: last?, bell: bell?, table_style: table_style,
+      %{help: false, last: last, bell: bell, table_style: table_style,
         max_width: max_width
       } <- Map.merge(Map.new(@switches), Map.new(switches)),
       {:ok, style} <- Style.style_for(table_style)
     do
-      {state, last? && -count || count, bell?, style, max_width}
+      {state, last && -count || count, bell, style, max_width}
     else
       _ -> :help
     end
   end
   defp reformat(_), do: :help
 
-  @spec normalize([String.t]) :: {state, non_neg_integer} | :error
+  @spec normalize([String.t]) :: {Observations.state, non_neg_integer} | :error
   defp normalize [state, count] do
     with {int, ""} when int >= 0 <- Integer.parse(count) do
       {String.downcase(state), int}

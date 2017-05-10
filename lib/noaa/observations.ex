@@ -9,6 +9,7 @@ defmodule NOAA.Observations do
   import Logger, only: [info: 1]
 
   @type observation :: map
+  @type state :: String.t
   @type station_id :: String.t
 
   @app           Mix.Project.config[:app]
@@ -33,7 +34,7 @@ defmodule NOAA.Observations do
       alias NOAA.Observations
       Observations.fetch "vt"
   """
-  @spec fetch(String.t, Keyword.t) :: {:ok, [observation]} | {:error, String.t}
+  @spec fetch(state, Keyword.t) :: {:ok, [observation]} | {:error, String.t}
   def fetch(state, options \\ []) do
     info "Fetching NOAA Observations from state/territory: #{state}..."
     with url_templates <- Keyword.get(options, :url_templates, @url_templates),
@@ -68,7 +69,7 @@ defmodule NOAA.Observations do
       url_templates = Application.get_env app, :url_templates
       Observations.stations "vt", url_templates
   """
-  @spec stations(String.t, map) :: {:ok, [station_id]} | {:error, String.t}
+  @spec stations(state, map) :: {:ok, [station_id]} | {:error, String.t}
   def stations(state, %{state: url_template}) do
     try do
       with url <- url(url_template, state: state),
