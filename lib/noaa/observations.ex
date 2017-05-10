@@ -12,7 +12,7 @@ defmodule NOAA.Observations do
   @type station_id :: String.t
 
   @app           Mix.Project.config[:app]
-  @url_templates Application.get_env(@app, :url_templates)
+  @url_templates Application.get_env @app, :url_templates
 
   @doc """
   Fetches weather observations from a US `state`/territory.
@@ -26,7 +26,7 @@ defmodule NOAA.Observations do
 
   ## Options
 
-    - `:url_templates` - defaults to config value `:url_templates` (map)
+    - `:url_templates` - defaults to config for `:url_templates` (map)
 
   ## Examples
 
@@ -65,8 +65,8 @@ defmodule NOAA.Observations do
 
       alias NOAA.Observations
       app = Mix.Project.config[:app]
-      url_templates = Application.get_env(app, :url_templates)
-      Observations.stations("vt", url_templates)
+      url_templates = Application.get_env app, :url_templates
+      Observations.stations "vt", url_templates
   """
   @spec stations(String.t, map) :: {:ok, [station_id]} | {:error, String.t}
   def stations(state, %{state: url_template}) do
@@ -106,8 +106,8 @@ defmodule NOAA.Observations do
 
       alias NOAA.Observations
       app = Mix.Project.config[:app]
-      url_templates = Application.get_env(app, :url_templates)
-      Observations.observation("KBTV", url_templates)
+      url_templates = Application.get_env app, :url_templates
+      Observations.observation "KBTV", url_templates
   """
   @spec observation(station_id, map) :: {:ok, observation} | {:error, String.t}
   def observation(station, %{station: url_template}) do
@@ -145,20 +145,20 @@ defmodule NOAA.Observations do
 
       iex> alias NOAA.Observations
       iex> app = Mix.Project.config[:app]
-      iex> %{station: url_template} = Application.get_env(app, :url_templates)
-      iex> Observations.url(url_template, station: "KBTV")
+      iex> %{station: url_template} = Application.get_env app, :url_templates
+      iex> Observations.url url_template, station: "KBTV"
       "http://w1.weather.gov/xml/current_obs/KBTV.xml"
 
       iex> alias NOAA.Observations
       iex> app = Mix.Project.config[:app]
-      iex> %{state: url_template} = Application.get_env(app, :url_templates)
-      iex> Observations.url(url_template, state: "vt")
+      iex> %{state: url_template} = Application.get_env app, :url_templates
+      iex> Observations.url url_template, state: "vt"
       "http://w1.weather.gov/xml/current_obs/seek.php?state=vt&Find=Find"
 
       iex> alias NOAA.Observations
       iex> url_template = "https://weather.gc.ca/forecast/canada/" <>
       ...>   "index_e.html?id=<st>"
-      iex> Observations.url(url_template, state: "qc")
+      iex> Observations.url url_template, state: "qc"
       "https://weather.gc.ca/forecast/canada/index_e.html?id=qc"
   """
   @spec url(String.t, Keyword.t) :: String.t

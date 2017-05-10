@@ -18,12 +18,12 @@ defmodule NOAA.Observations.CLI do
     | :help
 
   @app        Mix.Project.config[:app]
-  @aliases    Application.get_env(@app, :aliases)
-  @count      Application.get_env(@app, :default_count)
-  @escript    Mix.Local.name_for(:escript, Mix.Project.config)
-  @help_attrs Application.get_env(@app, :help_attrs)
-  @strict     Application.get_env(@app, :strict)
-  @switches   Application.get_env(@app, :default_switches)
+  @aliases    Application.get_env @app, :aliases
+  @count      Application.get_env @app, :default_count
+  @escript    Mix.Local.name_for :escript, Mix.Project.config
+  @help_attrs Application.get_env @app, :help_attrs
+  @strict     Application.get_env @app, :strict
+  @switches   Application.get_env @app, :default_switches
 
   @doc """
   Parses and processes the `command line arguments`.
@@ -172,19 +172,19 @@ defmodule NOAA.Observations.CLI do
   ## Examples
 
       iex> alias NOAA.Observations.CLI
-      iex> CLI.parse(["-h"])
+      iex> CLI.parse ["-h"]
       :help
 
       iex> alias NOAA.Observations.CLI
-      iex> CLI.parse(["vt", "99"])
+      iex> CLI.parse ["vt", "99"]
       {"vt", 99, false, :dark, 88}
 
       iex> alias NOAA.Observations.CLI
-      iex> CLI.parse(["TX", "88", "--last", "--bell"])
+      iex> CLI.parse ["TX", "88", "--last", "--bell"]
       {"tx", -88, true, :dark, 88}
 
       iex> alias NOAA.Observations.CLI
-      iex> CLI.parse(["nc", "6", "--table-style", "cyan"])
+      iex> CLI.parse ["nc", "6", "--table-style", "cyan"]
       {"nc", 6, false, :cyan, 88}
   """
   @spec parse([String.t]) :: parsed
@@ -195,7 +195,7 @@ defmodule NOAA.Observations.CLI do
   end
 
   @spec reformat({Keyword.t, [String.t], [tuple]}) :: parsed
-  defp reformat({switches, args, []}) do
+  defp reformat {switches, args, []} do
     with {state, count} <- normalize(args),
       %{help: false, last: last, bell: bell, table_style: table_style,
         max_width: max_width
@@ -210,13 +210,17 @@ defmodule NOAA.Observations.CLI do
   defp reformat(_), do: :help
 
   @spec normalize([String.t]) :: {String.t, non_neg_integer} | :error
-  defp normalize([state, count]) do
+  defp normalize [state, count] do
     with {int, ""} when int >= 0 <- Integer.parse(count) do
       {String.downcase(state), int}
     else
       _ -> :error
     end
   end
-  defp normalize([state]), do: {String.downcase(state), @count}
-  defp normalize(_), do: :error
+  defp normalize [state] do
+    {String.downcase(state), @count}
+  end
+  defp normalize(_) do
+    :error
+  end
 end

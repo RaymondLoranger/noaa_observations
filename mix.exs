@@ -3,7 +3,7 @@ defmodule NOAA.Observations.Mixfile do
 
   def project do
     [ app: :noaa_observations,
-      version: "0.1.10",
+      version: "0.2.0",
       elixir: "~> 1.4",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -52,7 +52,7 @@ defmodule NOAA.Observations.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [ {:io_ansi_table, "~> 0.1"},
+    [ {:io_ansi_table, "~> 0.2"},
       {:earmark, "~> 1.0", only: :dev},
       {:ex_doc, "~> 0.14", only: :dev, runtime: false},
       {:httpoison, "~> 0.11"},
