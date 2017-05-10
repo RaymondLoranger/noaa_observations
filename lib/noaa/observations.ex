@@ -31,7 +31,7 @@ defmodule NOAA.Observations do
   ## Examples
 
       alias NOAA.Observations
-      Observations.fetch("vt")
+      Observations.fetch "vt"
   """
   @spec fetch(String.t, Keyword.t) :: {:ok, [observation]} | {:error, String.t}
   def fetch(state, options \\ []) do
