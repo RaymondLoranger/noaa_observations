@@ -21,8 +21,8 @@ config :io_ansi_table, align_attrs: %{
 config :io_ansi_table, headers: [
   # "station_id", "latitude", "weather", "temperature_string", "wind_mph",
   "station_id", "weather", "temperature_string", "wind_mph",
-  "location", "observation_time_rfc822"
-  # "location"
+  # "location", "observation_time_rfc822"
+  "location"
 ]
 config :io_ansi_table, header_fixes: %{
   ~r[ id$]i       => " ID",
