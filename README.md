@@ -26,7 +26,8 @@ On macOS, you would run the application as follows:
   - ./no --help
   - ./no ny 9 --last --table-style=dark
 
-N.B. The escript is named `no` for **n**oaa_**o**bservations.
+N.B. The escript is named `no` for **n**oaa_**o**bservations. The ideal
+background color is **navy blue**.
 
 ## Examples
 ## ![noaa_observations_examples](images/noaa_observations_examples.png)
