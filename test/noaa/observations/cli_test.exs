@@ -1,14 +1,13 @@
-
 defmodule NOAA.Observations.CLITest do
   @moduledoc false
 
   use ExUnit.Case, async: true
+  use PersistConfig
 
   alias NOAA.Observations.CLI
 
   doctest CLI
 
-  @app   Mix.Project.config[:app]
   @count Application.get_env(@app, :default_count)
 
   describe "NOAA.Observations.CLI.parse/1" do
@@ -19,30 +18,29 @@ defmodule NOAA.Observations.CLITest do
       assert CLI.parse(["st", "--help"]) == :help
     end
 
-    test "returns 5 values if 2 given" do
-      assert CLI.parse(["STATE", "99"])
-      == {"state", 99, false, :dark, 88}
+    test "returns 4 values if 2 given" do
+      assert CLI.parse(["STATE", "99"]) == {"state", 99, false, :dark}
     end
 
     test "defaults count if not given" do
-      assert CLI.parse(["st"])           == {"st", @count , false, :dark, 88}
-      assert CLI.parse(["st", "--last"]) == {"st", -@count, false, :dark, 88}
+      assert CLI.parse(["st"])           == {"st", @count , false, :dark}
+      assert CLI.parse(["st", "--last"]) == {"st", -@count, false, :dark}
     end
 
-    test "returns 5 values if 3 given" do
-      assert CLI.parse(["st", "99", "--last"]) == {"st", -99, false, :dark, 88}
-      assert CLI.parse(["St", "--last", "99"]) == {"st", -99, false, :dark, 88}
+    test "returns 4 values if 3 given" do
+      assert CLI.parse(["st", "99", "--last"]) == {"st", -99, false, :dark}
+      assert CLI.parse(["St", "--last", "99"]) == {"st", -99, false, :dark}
     end
 
-    test "returns 5 values if count is zero" do
-      assert CLI.parse(["st", "0"])           == {"st", 0, false, :dark, 88}
-      assert CLI.parse(["st", "0", "--last"]) == {"st", 0, false, :dark, 88}
-      assert CLI.parse(["st", "-0"])          == {"st", 0, false, :dark, 88}
+    test "returns 4 values if count is zero" do
+      assert CLI.parse(["st", "0"])           == {"st", 0, false, :dark}
+      assert CLI.parse(["st", "0", "--last"]) == {"st", 0, false, :dark}
+      assert CLI.parse(["st", "-0"])          == {"st", 0, false, :dark}
     end
 
     test "returns :help if count not positive integer" do
-      assert CLI.parse(["st", "nine"]) == :help
-      assert CLI.parse(["st", "-999"]) == :help
+      assert CLI.parse(["st", "nine"])           == :help
+      assert CLI.parse(["st", "-999"])           == :help
       assert CLI.parse(["st", "--bell", "-999"]) == :help
     end
 

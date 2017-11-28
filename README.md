@@ -1,4 +1,3 @@
-
 # NOAA Observations
 
 Prints NOAA Observations to STDOUT in a table with borders and colors.
@@ -18,8 +17,8 @@ Then run these commands (in **Powershell** on Windows) to build the escript:
 
 Now you can run the application like so on Windows:
 
-  - escript no --help (now in colors)
-  - escript no ny 9 --last --table-style=dark
+  - escript no --help
+  - escript no ny 9 -blt dark
 
 On macOS, you would run the application as follows:
 
