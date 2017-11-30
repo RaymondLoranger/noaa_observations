@@ -4,7 +4,7 @@ defmodule NOAA.Observations.Mixfile do
   def project() do
     [
       app: :noaa_observations,
-      version: "0.3.1",
+      version: "0.3.2",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
       name: "NOAA Observations",
@@ -14,10 +14,7 @@ defmodule NOAA.Observations.Mixfile do
       aliases: aliases(),
       escript: escript(),
       deps: deps(),
-      dialyzer: [
-        plt_add_apps: [:mix],
-        ignore_warnings: "dialyzer.ignore-warnings"
-      ]
+      dialyzer: [ignore_warnings: "dialyzer.ignore-warnings"]
     ]
   end
 
@@ -43,7 +40,7 @@ defmodule NOAA.Observations.Mixfile do
   # Run "mix help compile.app" to learn about applications.
   def application() do
     [
-      extra_applications: [:logger, :httpoison]
+      extra_applications: [:logger]
     ]
   end
 

@@ -48,7 +48,6 @@ defmodule NOAA.Observations do
       |> case do
            %{error: errors} -> {:error, List.first(errors)}
            %{ok: observations} -> {:ok, observations}
-           %{} -> {:error, "unknown error"}
          end
     end
   end
@@ -114,7 +113,6 @@ defmodule NOAA.Observations do
         {:ok, %{status_code: 302}} -> {:error, "status code: 302 (not found)"}
         {:ok, %{status_code: 404}} -> {:error, "status code: 404 (not found)"}
         {:error, %{reason: reason}} -> {:error, "reason: #{inspect reason}"}
-        any -> {:error, "unknown: #{inspect any}"}
       end
     rescue
       error -> {:error, "exception: #{Exception.message error}"}
