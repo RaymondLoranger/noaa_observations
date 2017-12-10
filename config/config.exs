@@ -16,7 +16,7 @@ config :io_ansi_table, header_fixes: %{
   ~r[ mph$]i => " MPH"
 }
 config :io_ansi_table, sort_specs: [
-  desc: "temperature_string", asc: "location"
+  desc: "temperature_string", asc: "wind_mph"
 ]
 config :io_ansi_table, margins: [
   top:    0, # line(s) before table
