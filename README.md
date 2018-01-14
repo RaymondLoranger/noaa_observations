@@ -8,7 +8,7 @@ To use `NOAA Observations`, first clone it from GitHub:
 
   - git clone https://github.com/RaymondLoranger/noaa_observations
 
-Then run these commands (in **Powershell** on Windows) to build the escript:
+Then run these commands to build the escript:
 
   - cd noaa_observations
   - chcp 65001 (on Windows)
@@ -25,8 +25,7 @@ On macOS, you would run the application as follows:
   - ./no --help
   - ./no ny 9 --last --table-style=dark
 
-N.B. The escript is named `no` for **n**oaa_**o**bservations. On Windows,
-the background color should be **DarkBlue** and the font **Consolas**.
+N.B. The escript is named `no` for **n**oaa_**o**bservations.
 
 ## Examples
 ## ![noaa_observations_examples](images/noaa_observations_examples.png)
