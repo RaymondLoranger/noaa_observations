@@ -37,18 +37,19 @@ defmodule NOAA.Observations do
       alias NOAA.Observations
       Observations.fetch("vt")
   """
-  @spec fetch(CLI.state, Keyword.t) :: {:ok, [obs]} | {:error, String.t}
+  @spec fetch(CLI.state(), Keyword.t()) :: {:ok, [obs]} | {:error, String.t()}
   def fetch(state, url_templates \\ @url_templates) do
     Logger.info("Fetching NOAA Observations for state/territory: #{state}...")
+
     with url_templates <- Keyword.merge(@url_templates, url_templates),
          {:ok, stations} <- stations(state, url_templates) do
       stations
       |> Stream.map(&obs(&1, url_templates))
       |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
       |> case do
-           %{error: errors} -> {:error, List.first(errors)}
-           %{ok: observations} -> {:ok, observations}
-         end
+        %{error: errors} -> {:error, List.first(errors)}
+        %{ok: observations} -> {:ok, observations}
+      end
     end
   end
 
@@ -62,7 +63,8 @@ defmodule NOAA.Observations do
     - `state`         - US state/territory code
     - `url_templates` - URL templates
   """
-  @spec stations(CLI.state, Keyword.t) :: {:ok, [CLI.stn]} | {:error, String.t}
+  @spec stations(CLI.state(), Keyword.t()) ::
+          {:ok, [CLI.stn()]} | {:error, String.t()}
   def stations(state, url_templates) do
     try do
       with url <- url(url_templates[:state], state: state),
@@ -72,17 +74,17 @@ defmodule NOAA.Observations do
           # <a href="display.php?stid=(KCDA)">Caledonia County Airport</a>
           ~r[<a href=".*?stid=(.*?)">.*?</a>] # capture station
           |> Regex.scan(body, capture: :all_but_first) # i.e. only subpattern
-          |> List.flatten # each item is [stn]
+          |> List.flatten() # each item is [stn]
         }
       else
         {:ok, %{status_code: 301}} -> {:error, "status code: 301 (not found)"}
         {:ok, %{status_code: 302}} -> {:error, "status code: 302 (not found)"}
         {:ok, %{status_code: 404}} -> {:error, "status code: 404 (not found)"}
-        {:error, %{reason: reason}} -> {:error, "reason: #{inspect reason}"}
-        any -> {:error, "unknown: #{inspect any}"}
+        {:error, %{reason: reason}} -> {:error, "reason: #{inspect(reason)}"}
+        any -> {:error, "unknown: #{inspect(any)}"}
       end
     rescue
-      error -> {:error, "exception: #{Exception.message error}"}
+      error -> {:error, "exception: #{Exception.message(error)}"}
     end
   end
 
@@ -96,7 +98,7 @@ defmodule NOAA.Observations do
     - `station`       - NOAA station
     - `url_templates` - URL templates
   """
-  @spec obs(CLI.stn, Keyword.t) :: {:ok, obs} | {:error, String.t}
+  @spec obs(CLI.stn(), Keyword.t()) :: {:ok, obs} | {:error, String.t()}
   def obs(station, url_templates) do
     try do
       with url <- url(url_templates[:station], station: station),
@@ -112,10 +114,10 @@ defmodule NOAA.Observations do
         {:ok, %{status_code: 301}} -> {:error, "status code: 301 (not found)"}
         {:ok, %{status_code: 302}} -> {:error, "status code: 302 (not found)"}
         {:ok, %{status_code: 404}} -> {:error, "status code: 404 (not found)"}
-        {:error, %{reason: reason}} -> {:error, "reason: #{inspect reason}"}
+        {:error, %{reason: reason}} -> {:error, "reason: #{inspect(reason)}"}
       end
     rescue
-      error -> {:error, "exception: #{Exception.message error}"}
+      error -> {:error, "exception: #{Exception.message(error)}"}
     end
   end
 
@@ -149,10 +151,11 @@ defmodule NOAA.Observations do
   #     iex> Observations.url(url_template, state: "qc")
   #     "https://weather.gc.ca/forecast/canada/index_e.html?id=qc"
   # """
-  @spec url(String.t, Keyword.t) :: String.t
+  @spec url(String.t(), Keyword.t()) :: String.t()
   defp url(url_template, station: station) do
     String.replace(url_template, ~r/{stn}|<stn>/, station)
   end
+
   defp url(url_template, state: state) do
     String.replace(url_template, ~r/{st}|<st>/, state)
   end

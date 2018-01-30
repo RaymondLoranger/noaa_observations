@@ -1,12 +1,12 @@
 defmodule NOAA.Observations.Mixfile do
   use Mix.Project
 
-  def project() do
+  def project do
     [
       app: :noaa_observations,
-      version: "0.3.11",
+      version: "0.3.12",
       elixir: "~> 1.5",
-      start_permanent: Mix.env == :prod,
+      start_permanent: Mix.env() == :prod,
       name: "NOAA Observations",
       source_url: source_url(),
       description: description(),
@@ -18,19 +18,19 @@ defmodule NOAA.Observations.Mixfile do
     ]
   end
 
-  defp source_url() do
+  defp source_url do
     "https://github.com/RaymondLoranger/noaa_observations"
   end
 
-  defp description() do
+  defp description do
     """
     Prints NOAA Observations to STDOUT in a table with borders and colors.
     """
   end
 
-  defp package() do
+  defp package do
     [
-      files: ["lib", "mix.exs", "README*", "config/config.exs"],
+      files: ["lib", "mix.exs", "README*", "config/persist*.exs"],
       maintainers: ["Raymond Loranger"],
       licenses: ["MIT"],
       links: %{"GitHub" => source_url()}
@@ -38,14 +38,14 @@ defmodule NOAA.Observations.Mixfile do
   end
 
   # Run "mix help compile.app" to learn about applications.
-  def application() do
+  def application do
     [
       extra_applications: [:logger]
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
-  defp deps() do
+  defp deps do
     [
       {:mix_tasks, path: "../mix_tasks", only: :dev, runtime: false},
       {:persist_config, "~> 0.1"},
@@ -58,7 +58,7 @@ defmodule NOAA.Observations.Mixfile do
     ]
   end
 
-  defp aliases() do
+  defp aliases do
     [
       docs: ["docs", &copy_images/1]
     ]
@@ -66,15 +66,20 @@ defmodule NOAA.Observations.Mixfile do
 
   defp copy_images(_) do
     File.cp_r("images", "doc/images", fn src, dst ->
-      src || dst # => true
-      # IO.gets(~s|Overwriting "#{dst}" with "#{src}".\nProceed? [Yn]\s|)
-      # in ["y\n", "Y\n"]
+      # Always true...
+      src || dst
+
+      # IO.gets(~s|Overwriting "#{dst}" with "#{src}".\nProceed? [Yn]\s|) in [
+      #   "y\n",
+      #   "Y\n"
+      # ]
     end)
   end
 
-  defp escript() do
+  defp escript do
     [
-      main_module: NOAA.Observations.CLI, name: :no
+      main_module: NOAA.Observations.CLI,
+      name: :no
     ]
   end
 end

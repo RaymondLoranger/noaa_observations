@@ -28,70 +28,83 @@ defmodule NOAA.Observations.Help do
             [:section, :normal, :command, :normal],
             ["usage:", " ", "escript", " #{@escript}"]
           }
+
         {:unix, _} ->
           {
             [:section, :normal],
             ["usage:", " ./#{@escript}"]
           }
       end
+
     filler = " " |> String.duplicate(texts |> Enum.join() |> String.length())
     prefix = help_format(types, texts)
+
     line_us_state_code =
-      help_format(
-        [:switch, :arg],
-        ["[(-h | --help)] ", "<us-state-code>"]
-      )
+      help_format([:switch, :arg], ["[(-h | --help)] ", "<us-state-code>"])
+
     line_count =
-      help_format(
-        [:switch, :normal, :arg, :normal, :switch],
-        ["[(-l | --last)]", " ", "<count>", " ", "[(-b | --bell)]"]
-      )
+      help_format([:switch, :normal, :arg, :normal, :switch], [
+        "[(-l | --last)]",
+        " ",
+        "<count>",
+        " ",
+        "[(-b | --bell)]"
+      ])
+
     line_table_style =
-      help_format(
-        [:switch, :arg, :switch],
-        ["[(-t | --table-style)=", "<table-style>", "]"]
-      )
-    line_where =
-      help_format(
-        [:section],
-        ["where:"]
-      )
+      help_format([:switch, :arg, :switch], [
+        "[(-t | --table-style)=",
+        "<table-style>",
+        "]"
+      ])
+
+    line_where = help_format([:section], ["where:"])
+
     line_default_count =
-      help_format(
-        [:normal, :arg, :normal, :value],
-        ["  - default ", "<count>", " is ", "#{@count}"]
-      )
+      help_format([:normal, :arg, :normal, :value], [
+        "  - default ",
+        "<count>",
+        " is ",
+        "#{@count}"
+      ])
+
     line_default_table_style =
-      help_format(
-        [:normal, :arg, :normal, :value],
-        ["  - default ", "<table-style>", " is ", "#{@switches[:table_style]}"]
-      )
+      help_format([:normal, :arg, :normal, :value], [
+        "  - default ",
+        "<table-style>",
+        " is ",
+        "#{@switches[:table_style]}"
+      ])
+
     line_table_style_one_of =
-      help_format(
-        [:normal, :arg, :normal],
-        ["  - ", "<table-style>", " is one of:"]
-      )
-    IO.write(
-      """
-      #{prefix} #{line_us_state_code}
-      #{filler} #{line_count}
-      #{filler} #{line_table_style}
-      #{line_where}
-      #{line_default_count}
-      #{line_default_table_style}
-      #{line_table_style_one_of}
-      """
-    )
+      help_format([:normal, :arg, :normal], [
+        "  - ",
+        "<table-style>",
+        " is one of:"
+      ])
+
+    IO.write("""
+    #{prefix} #{line_us_state_code}
+    #{filler} #{line_count}
+    #{filler} #{line_table_style}
+    #{line_where}
+    #{line_default_count}
+    #{line_default_table_style}
+    #{line_table_style_one_of}
+    """)
+
     template =
-      help_format(
-        [:normal, :value, :normal],
-        ["\s\s\s\s• ", "&arg", "&filler - &note"]
-      )
+      help_format([:normal, :value, :normal], [
+        "\s\s\s\s• ",
+        "&arg",
+        "&filler - &note"
+      ])
+
     Style.texts("#{template}", &IO.puts/1)
     System.halt(0)
   end
 
-  @spec help_format([atom], [String.t]) :: IO.chardata
+  @spec help_format([atom], [String.t()]) :: IO.chardata()
   defp help_format(types, texts) do
     types
     |> Enum.map(&@help_attrs[&1])

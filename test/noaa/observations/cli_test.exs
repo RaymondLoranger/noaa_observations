@@ -23,7 +23,7 @@ defmodule NOAA.Observations.CLITest do
     end
 
     test "defaults count if not given" do
-      assert CLI.parse(["st"])           == {"st", @count , false, :dark}
+      assert CLI.parse(["st"]) == {"st", @count, false, :dark}
       assert CLI.parse(["st", "--last"]) == {"st", -@count, false, :dark}
     end
 
@@ -33,14 +33,14 @@ defmodule NOAA.Observations.CLITest do
     end
 
     test "returns 4 values if count is zero" do
-      assert CLI.parse(["st", "0"])           == {"st", 0, false, :dark}
+      assert CLI.parse(["st", "0"]) == {"st", 0, false, :dark}
       assert CLI.parse(["st", "0", "--last"]) == {"st", 0, false, :dark}
-      assert CLI.parse(["st", "-0"])          == {"st", 0, false, :dark}
+      assert CLI.parse(["st", "-0"]) == {"st", 0, false, :dark}
     end
 
     test "returns :help if count not positive integer" do
-      assert CLI.parse(["st", "nine"])           == :help
-      assert CLI.parse(["st", "-999"])           == :help
+      assert CLI.parse(["st", "nine"]) == :help
+      assert CLI.parse(["st", "-999"]) == :help
       assert CLI.parse(["st", "--bell", "-999"]) == :help
     end
 

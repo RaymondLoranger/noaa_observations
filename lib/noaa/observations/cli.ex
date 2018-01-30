@@ -18,9 +18,9 @@ defmodule NOAA.Observations.CLI do
 
   @type bell :: boolean
   @type count :: integer
-  @type parsed :: {state, count, bell, Style.t} | :help
-  @type state :: String.t
-  @type stn :: String.t
+  @type parsed :: {state, count, bell, Style.t()} | :help
+  @type state :: String.t()
+  @type stn :: String.t()
 
   @aliases Application.get_env(@app, :aliases)
   @async Application.get_env(:io_ansi_table, :async)
@@ -35,17 +35,17 @@ defmodule NOAA.Observations.CLI do
 
     - `argv` - command line arguments (list)
   """
-  @spec main([String.t]) :: :ok | no_return
+  @spec main([String.t()]) :: :ok | no_return
   def main(argv) do
     with {state, count, bell, style} <- parse(argv),
          {:ok, observations} <- Observations.fetch(state) do
       Table.format(observations, count: count, bell: bell, style: style)
       # Ensure table has printed before returning...
-      Process.sleep(@async && 2000 || 0)
+      Process.sleep((@async && 2000) || 0)
     else
       :help -> Help.show_help()
       {:error, text} -> log_error(text)
-      any -> log_error("unknown: #{inspect any}")
+      any -> log_error("unknown: #{inspect(any)}")
     end
   end
 
@@ -95,7 +95,7 @@ defmodule NOAA.Observations.CLI do
       iex> CLI.parse ["nc", "6", "--table-style", "cyan"]
       {"nc", 6, false, :cyan}
   """
-  @spec parse([String.t]) :: parsed
+  @spec parse([String.t()]) :: parsed
   def parse(argv) do
     argv
     |> OptionParser.parse(strict: @strict, aliases: @aliases)
@@ -104,30 +104,33 @@ defmodule NOAA.Observations.CLI do
 
   ## Private functions
 
-  @spec log_error(String.t) :: no_return
+  @spec log_error(String.t()) :: no_return
   defp log_error(text) do
     Logger.error("Error fetching from NOAA - #{text}")
-    Process.sleep(1000) # ensure message logged before exiting
+    # Ensure message logged before exiting...
+    Process.sleep(1000)
     System.halt(2)
   end
 
-  @spec to_parsed({Keyword.t, [String.t], [tuple]}) :: parsed
+  @spec to_parsed({Keyword.t(), [String.t()], [tuple]}) :: parsed
   defp to_parsed({switches, args, []}) do
     with {state, count} <- to_tuple(args),
          %{help: false, last: last, bell: bell, table_style: table_style} <-
            Map.merge(Map.new(@switches), Map.new(switches)),
          {:ok, style} <- Style.from_switch_arg(table_style),
-         do: {state, last && -count || count, bell, style},
+         do: {state, (last && -count) || count, bell, style},
          else: (_ -> :help)
   end
+
   defp to_parsed(_), do: :help
 
-  @spec to_tuple([String.t]) :: {state, non_neg_integer} | :error
+  @spec to_tuple([String.t()]) :: {state, non_neg_integer} | :error
   defp to_tuple([state, count]) do
     with {int, ""} when int >= 0 <- Integer.parse(count),
          do: {String.downcase(state), int},
          else: (_ -> :error)
   end
+
   defp to_tuple([state]), do: {String.downcase(state), @count}
   defp to_tuple(_), do: :error
 end
