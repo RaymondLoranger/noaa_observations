@@ -25,4 +25,9 @@ On macOS, you would run the application as follows:
   - ./no ny 9 --last --table-style=dark
 
 ## Examples
-## ![noaa_observations_examples](images/noaa_observations_examples.png)
+## ![pretty](images/pretty.png)
+## ![pretty_alt](images/pretty_alt.png)
+## ![pretty_mult](images/pretty_mult.png)
+## ![dotted](images/dotted.png)
+## ![dotted_alt](images/dotted_alt.png)
+## ![dotted_mult](images/dotted_mult.png)
