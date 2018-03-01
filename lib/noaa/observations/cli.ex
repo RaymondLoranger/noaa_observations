@@ -35,6 +35,7 @@ defmodule NOAA.Observations.CLI do
 
     - `argv` - command line arguments (list)
   """
+  @dialyzer {:nowarn_function, main: 1}
   @spec main([String.t()]) :: :ok | no_return
   def main(argv) do
     with {state, count, bell, style} <- parse(argv),

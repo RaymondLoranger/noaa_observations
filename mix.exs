@@ -4,7 +4,7 @@ defmodule NOAA.Observations.Mixfile do
   def project do
     [
       app: :noaa_observations,
-      version: "0.4.2",
+      version: "0.4.3",
       elixir: "~> 1.5",
       start_permanent: Mix.env() == :prod,
       name: "NOAA Observations",
@@ -13,8 +13,8 @@ defmodule NOAA.Observations.Mixfile do
       package: package(),
       aliases: aliases(),
       escript: escript(),
-      deps: deps(),
-      dialyzer: [ignore_warnings: "dialyzer.ignore-warnings"]
+      deps: deps()
+      # dialyzer: [ignore_warnings: "dialyzer.ignore-warnings"]
     ]
   end
 
