@@ -27,6 +27,9 @@ config :noaa_observations,
   }
 
 config :noaa_observations,
+  home_page: "https://pragprog.com/book/elixir16/programming-elixir-1-6"
+
+config :noaa_observations,
   strict: [
     help: :boolean,
     last: :boolean,

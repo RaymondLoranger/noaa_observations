@@ -2,12 +2,17 @@
 # │ Exercise in the book "Programming Elixir" by Dave Thomas. │
 # └───────────────────────────────────────────────────────────┘
 defmodule NOAA.Observations.CLI do
+  use PersistConfig
+
+  @home_page Application.get_env(@app, :home_page)
+
   @moduledoc """
   Parses the command line and generates a table of
   observations from the NOAA Weather Service.
-  """
 
-  use PersistConfig
+  Exercise in the book [Programming Elixir](#{@home_page})
+  by Dave Thomas.
+  """
 
   alias IO.ANSI.Table
   alias IO.ANSI.Table.Style
