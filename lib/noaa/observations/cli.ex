@@ -4,14 +4,13 @@
 defmodule NOAA.Observations.CLI do
   use PersistConfig
 
-  @home_page Application.get_env(@app, :home_page)
+  @book_ref Application.get_env(@app, :book_ref)
 
   @moduledoc """
   Parses the command line and generates a table of
   observations from the NOAA Weather Service.
 
-  Exercise in the book [Programming Elixir](#{@home_page})
-  by Dave Thomas.
+  ##### #{@book_ref}
   """
 
   alias IO.ANSI.Table

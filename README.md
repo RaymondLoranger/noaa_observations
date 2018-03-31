@@ -2,6 +2,8 @@
 
 Prints NOAA Observations to STDOUT in a table with borders and colors.
 
+##### Exercise in the book [Programming Elixir](https://pragprog.com/book/elixir16/programming-elixir-1-6) by Dave Thomas.
+
 ## Using
 
 To use `NOAA Observations`, first clone it from GitHub:
