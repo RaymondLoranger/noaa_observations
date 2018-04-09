@@ -20,4 +20,8 @@ erl_crash.dump
 *.ez
 
 perso*
+tree*
 /log
+mix.lock
+dialyzer.ignore-warnings
+no
