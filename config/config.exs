@@ -10,13 +10,13 @@ config :elixir, ansi_enabled: true
 
 config :io_ansi_table,
   align_specs: [
-    center: "station_id",
+    # center: "station_id",
     right: "wind_mph"
   ]
 
 config :io_ansi_table,
   headers: [
-    "station_id",
+    # "station_id",
     "weather",
     "temperature_string",
     "wind_mph",
@@ -25,7 +25,7 @@ config :io_ansi_table,
 
 config :io_ansi_table,
   header_fixes: %{
-    ~r[ id$]i => " ID",
+    # ~r[ id$]i => " ID",
     ~r[ mph$]i => " MPH"
   }
 
