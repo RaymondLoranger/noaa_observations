@@ -22,6 +22,5 @@ erl_crash.dump
 perso*
 tree*
 /log
-mix.lock
 dialyzer.ignore-warnings
 no
