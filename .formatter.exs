@@ -1,11 +1,9 @@
-exceptions = ["observations.ex"]
-
-inputs = [
-  ".formatter.exs",
-  "mix.exs" | Path.wildcard("{config,lib,test}/**/*.{ex,exs}")
-]
+wildcard = fn glob -> Path.wildcard(glob, match_dot: true) end
+matches = fn globs -> Enum.flat_map(globs, &wildcard.(&1)) end
+except = ["lib/**/observations.ex"]
+inputs = ["*.exs", "{config,lib,test}/**/*.{ex,exs}"]
 
 [
-  inputs: Enum.reject(inputs, &(Path.basename(&1) in exceptions)),
+  inputs: matches.(inputs) -- matches.(except),
   line_length: 80
 ]
