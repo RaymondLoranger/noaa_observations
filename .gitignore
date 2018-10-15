@@ -22,5 +22,6 @@ erl_crash.dump
 perso*
 tree*
 /log
+/.elixir_ls
 dialyzer.ignore-warnings
 no
