@@ -2,10 +2,9 @@
 # │ Exercise in the book "Programming Elixir" by Dave Thomas. │
 # └───────────────────────────────────────────────────────────┘
 defmodule NOAA.Observations do
-  # @moduledoc """
-  # Fetches a list of weather observations for a US state/territory.
-  # """
-  @moduledoc false
+  @moduledoc """
+  Fetches a list of weather observations for a US state/territory.
+  """
 
   use PersistConfig
 

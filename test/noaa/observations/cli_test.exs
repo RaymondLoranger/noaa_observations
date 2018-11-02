@@ -1,6 +1,4 @@
 defmodule NOAA.Observations.CLITest do
-  @moduledoc false
-
   use ExUnit.Case, async: true
   use PersistConfig
 

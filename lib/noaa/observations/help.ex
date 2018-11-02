@@ -1,6 +1,4 @@
 defmodule NOAA.Observations.Help do
-  @moduledoc false
-
   use PersistConfig
 
   alias IO.ANSI.Table.Style
