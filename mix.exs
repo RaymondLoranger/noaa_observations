@@ -4,7 +4,7 @@ defmodule NOAA.Observations.Mixfile do
   def project do
     [
       app: :noaa_observations,
-      version: "0.4.22",
+      version: "0.4.23",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       name: "NOAA Observations",
