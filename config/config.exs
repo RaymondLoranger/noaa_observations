@@ -81,5 +81,4 @@ config :logger, :info_log, path: "./log/info.log", level: :info
 config :noaa_observations, default_count: 13
 
 #     import_config "#{Mix.env}.exs"
-import_config "persist.exs"
-import_config "persist_book_ref.exs"
+import_config "persist*.exs"

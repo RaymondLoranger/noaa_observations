@@ -27,9 +27,6 @@ config :noaa_observations,
   }
 
 config :noaa_observations,
-  home_page: "https://pragprog.com/book/elixir16/programming-elixir-1-6"
-
-config :noaa_observations,
   strict: [
     help: :boolean,
     last: :boolean,
@@ -40,7 +37,6 @@ config :noaa_observations,
 config :noaa_observations,
   url_templates: [
     state:
-      "http://w1.weather.gov/" <>
-        "xml/current_obs/seek.php?state={st}&Find=Find",
-    station: "http://w1.weather.gov/xml/current_obs/{stn}.xml"
+      "https://w1.weather.gov/xml/current_obs/seek.php?state={st}&Find=Find",
+    station: "https://w1.weather.gov/xml/current_obs/display.php?stid={stn}"
   ]

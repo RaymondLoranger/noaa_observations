@@ -22,27 +22,25 @@ defmodule NOAA.ObservationsTest do
 
       assert Observations.fetch("vt", state: url) ==
                {:error, "reason: :nxdomain"}
-    end
 
-    test ~S[error "status code: 301 (not found)" if bad url given?] do
-      url = "http://www.weather.gov/xml/current_obs/{stn}.xml"
-
-      assert Observations.fetch("vt", station: url) ==
-               {:error, "status code: 301 (not found)"}
-    end
-
-    test ~S[error "status code: 404 (not found)" if bad url given?] do
-      url = "http://w1.weather.gov/xml/past_obs/{stn}.xml"
-
-      assert Observations.fetch("vt", station: url) ==
-               {:error, "status code: 404 (not found)"}
-    end
-
-    test ~S[error "exception: argument error" if bad url given] do
       url = "htp://w1.weather.gov/xml/current_obs/seek.php?state={st}&Find=Find"
 
       assert Observations.fetch("vt", state: url) ==
                {:error, "reason: :nxdomain"}
+    end
+
+    test ~S[error "status code: 301 Moved Permanently" if bad url given] do
+      url = "http://w1.weather.gov/xml/current_obs/display.php?stdid={stn}"
+
+      assert Observations.fetch("vt", station: url) ==
+               {:error, "status code: 301 ⇒ Moved Permanently"}
+    end
+
+    test ~S[error "status code: 404 Not Found" if bad url given] do
+      url = "https://w1.weather.gov/xml/past_obs/display.php?stdid={stn}"
+
+      assert Observations.fetch("vt", station: url) ==
+               {:error, "status code: 404 ⇒ Not Found"}
     end
   end
 
@@ -58,28 +56,26 @@ defmodule NOAA.ObservationsTest do
 
       assert Observations.stations("vt", state: url) ==
                {:error, "reason: :nxdomain"}
-    end
 
-    test ~S[error "status code: 301 (not found)" if bad url given?] do
-      url =
-        "http://www.weather.gov/xml/current_obs/seek.php?state={st}&Find=Find"
-
-      assert Observations.stations("vt", state: url) ==
-               {:error, "status code: 301 (not found)"}
-    end
-
-    test ~S[error "status code: 404 (not found)" if bad url given?] do
-      url = "http://w1.weather.gov/xml/past_obs/seek.php?state={st}&Find=Find"
-
-      assert Observations.stations("vt", state: url) ==
-               {:error, "status code: 404 (not found)"}
-    end
-
-    test ~S[error "exception: argument error" if bad url given] do
       url = "htp://w1.weather.gov/xml/current_obs/seek.php?state={st}&Find=Find"
 
       assert Observations.stations("vt", state: url) ==
                {:error, "reason: :nxdomain"}
+    end
+
+    test ~S[error "status code: 302 Found" if close url given] do
+      url =
+        "https://www.weather.gov/xml/current_obs/seek.php?state={st}&Find=Find"
+
+      assert Observations.stations("vt", state: url) ==
+               {:error, "status code: 302 ⇒ Found"}
+    end
+
+    test ~S[error "status code: 404 Not Found" if bad url given] do
+      url = "https://w1.weather.gov/xml/past_obs/seek.php?state={st}&Find=Find"
+
+      assert Observations.stations("vt", state: url) ==
+               {:error, "status code: 404 ⇒ Not Found"}
     end
   end
 
@@ -92,31 +88,29 @@ defmodule NOAA.ObservationsTest do
     end
 
     test ~S[error "reason: :nxdomain" if bad url given] do
-      url = "http://w1.weather.org/xml/current_obs/{stn}.xml"
+      url = "http://w1.weather.org/xml/current_obs/display.php?std={stn}"
 
       assert Observations.obs("KBTV", station: url) ==
                {:error, "reason: :nxdomain"}
-    end
 
-    test ~S[error "status code: 301 (not found)" if bad url given?] do
-      url = "http://www.weather.gov/xml/current_obs/{stn}.xml"
-
-      assert Observations.obs("KBTV", station: url) ==
-               {:error, "status code: 301 (not found)"}
-    end
-
-    test ~S[error "status code: 404 (not found)" if bad url given?] do
-      url = "http://w1.weather.gov/xml/past_obs/{stn}.xml"
-
-      assert Observations.obs("vt", station: url) ==
-               {:error, "status code: 404 (not found)"}
-    end
-
-    test ~S[error "exception: argument error" if bad url given] do
-      url = "htp://w1.weather.gov/xml/current_obs/{stn}.xml"
+      url = "htp://w1.weather.gov/xml/current_obs/display.php?std={stn}"
 
       assert Observations.obs("vt", station: url) ==
                {:error, "reason: :nxdomain"}
+    end
+
+    test ~S[error "status code: 302 Found" if close url given] do
+      url = "https://www.weather.gov/xml/current_obs/display.php?stdid={stn}"
+
+      assert Observations.obs("KBTV", station: url) ==
+               {:error, "status code: 302 ⇒ Found"}
+    end
+
+    test ~S[error "status code: 404 Not Found" if bad url given] do
+      url = "https://w1.weather.gov/xml/past_obs/display.php?stdid={stn}"
+
+      assert Observations.obs("vt", station: url) ==
+               {:error, "status code: 404 ⇒ Not Found"}
     end
   end
 end
