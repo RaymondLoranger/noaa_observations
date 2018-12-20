@@ -4,7 +4,7 @@ defmodule NOAA.Observations.Mixfile do
   def project do
     [
       app: :noaa_observations,
-      version: "0.4.26",
+      version: "0.4.27",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       name: "NOAA Observations",
@@ -30,7 +30,15 @@ defmodule NOAA.Observations.Mixfile do
 
   defp package do
     [
-      files: ["lib", "mix.exs", "README*", "config/persist*.exs"],
+      files: [
+        "lib",
+        "mix.exs",
+        "README*",
+        "config/persist*.exs",
+        "config/dev.exs",
+        "config/prod.exs",
+        "config/test.exs"
+      ],
       maintainers: ["Raymond Loranger"],
       licenses: ["MIT"],
       links: %{"GitHub" => source_url()}

@@ -43,7 +43,8 @@ defmodule NOAA.Observations do
     with url_templates <- Keyword.merge(@url_templates, url_templates),
          {:ok, stations} <- stations(state, url_templates) do
       stations
-      |> Stream.map(&obs(&1, url_templates))
+      # |> Stream.map(&obs(&1, url_templates))
+      |> pmap(&obs(&1, url_templates)) # parallel map
       |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
       |> case do
         %{error: errors} -> {:error, List.first(errors)}
@@ -163,5 +164,12 @@ defmodule NOAA.Observations do
 
   defp url(url_template, state: state) do
     String.replace(url_template, ~r/{st}|<st>/, state)
+  end
+
+  @spec pmap(Enum.t(), (any -> any)) :: list
+  defp pmap(enum, fun) do
+    enum
+    |> Enum.map(&Task.async(fn -> fun.(&1) end))
+    |> Enum.map(&Task.await/1)
   end
 end
