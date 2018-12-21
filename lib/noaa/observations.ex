@@ -123,6 +123,7 @@ defmodule NOAA.Observations do
   @spec status(pos_integer) :: String.t
   defp status(301), do: "status code: 301 ⇒ Moved Permanently"
   defp status(302), do: "status code: 302 ⇒ Found"
+  defp status(403), do: "status code: 403 ⇒ Forbidden"
   defp status(404), do: "status code: 404 ⇒ Not Found"
   defp status(code), do: "status code: #{code}"
 
