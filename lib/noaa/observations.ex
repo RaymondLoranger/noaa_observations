@@ -49,6 +49,7 @@ defmodule NOAA.Observations do
       |> case do
         %{error: errors} -> {:error, List.first(errors)}
         %{ok: observations} -> {:ok, observations}
+        %{} -> {:ok, []}
       end
     end
   end
