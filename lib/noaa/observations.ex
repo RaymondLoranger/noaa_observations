@@ -43,7 +43,7 @@ defmodule NOAA.Observations do
     with url_templates <- Keyword.merge(@url_templates, url_templates),
          {:ok, stations} <- stations(state, url_templates) do
       stations
-      # |> Stream.map(&obs(&1, url_templates))
+      # |> Enum.map(&obs(&1, url_templates))
       |> pmap(&obs(&1, url_templates)) # parallel map
       |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
       |> case do
