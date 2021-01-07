@@ -4,8 +4,8 @@ defmodule NOAA.Observations.Mixfile do
   def project do
     [
       app: :noaa_observations,
-      version: "0.4.32",
-      elixir: "~> 1.6",
+      version: "0.4.33",
+      elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       name: "NOAA Observations",
       source_url: source_url(),
@@ -13,8 +13,10 @@ defmodule NOAA.Observations.Mixfile do
       package: package(),
       aliases: aliases(),
       escript: escript(),
-      deps: deps()
-      # dialyzer: [ignore_warnings: "dialyzer.ignore-warnings"]
+      deps: deps(),
+      # NOAA.Observations.CLI.main/1...
+      # NOAA.Observations.url/2...
+      dialyzer: [plt_add_apps: [:io_ansi_table, :eex]]
     ]
   end
 
@@ -24,7 +26,7 @@ defmodule NOAA.Observations.Mixfile do
 
   defp description do
     """
-    Prints NOAA Observations to STDOUT in a table with borders and colors.
+    Writes NOAA Observations to stdout in a table with borders and colors.
     """
   end
 
@@ -40,6 +42,8 @@ defmodule NOAA.Observations.Mixfile do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
+      # Only using the `IO.ANSI.Table.write/3` function.
+      included_applications: [:io_ansi_table, :eex],
       extra_applications: [:logger]
     ]
   end
@@ -47,16 +51,15 @@ defmodule NOAA.Observations.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:dialyxir, "~> 1.0", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.22", only: :dev, runtime: false},
+      {:file_only_logger, "~> 0.1"},
+      {:httpoison, "~> 1.0"},
+      {:io_ansi_table, "~> 1.0"},
+      {:log_reset, "~> 0.1"},
       {:mix_tasks,
        github: "RaymondLoranger/mix_tasks", only: :dev, runtime: false},
-      {:log_reset, "~> 0.1"},
-      {:persist_config, "~> 0.2"},
-      {:io_ansi_table, "~> 0.4"},
-      {:earmark, "~> 1.0", only: :dev},
-      {:ex_doc, "~> 0.14", only: :dev, runtime: false},
-      {:dialyxir, "~> 0.5", only: :dev, runtime: false},
-      {:httpoison, "~> 1.0"},
-      {:logger_file_backend, "~> 0.0.9"}
+      {:persist_config, "~> 0.4", runtime: false}
     ]
   end
 

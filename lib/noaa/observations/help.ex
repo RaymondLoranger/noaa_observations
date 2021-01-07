@@ -1,14 +1,21 @@
 defmodule NOAA.Observations.Help do
+  @moduledoc """
+  Prints info on the command's usage and syntax.
+  """
+
   use PersistConfig
 
   alias IO.ANSI.Table.Style
 
-  @count Application.get_env(@app, :default_count)
-  @escript Mix.Local.name_for(:escript, Mix.Project.config())
-  @help_attrs Application.get_env(@app, :help_attrs)
-  @switches Application.get_env(@app, :default_switches)
+  @count get_env(:default_count)
+  @escript Mix.Project.config()[:escript][:name]
+  @help_attrs get_env(:help_attrs)
+  @switches get_env(:default_switches)
 
-  @spec show_help() :: no_return
+  @doc """
+  Prints info on the command's usage and syntax.
+  """
+  @spec show_help() :: :ok
   def show_help() do
     # Examples of usage on Windows:
     #   escript no --help
@@ -22,19 +29,14 @@ defmodule NOAA.Observations.Help do
     {types, texts} =
       case :os.type() do
         {:win32, _} ->
-          {
-            [:section, :normal, :command, :normal],
-            ["usage:", " ", "escript", " #{@escript}"]
-          }
+          {[:section, :normal, :command, :normal],
+           ["usage:", " ", "escript", " #{@escript}"]}
 
         {:unix, _} ->
-          {
-            [:section, :normal],
-            ["usage:", " ./#{@escript}"]
-          }
+          {[:section, :normal], ["usage:", " ./#{@escript}"]}
       end
 
-    filler = " " |> String.duplicate(texts |> Enum.join() |> String.length())
+    filler = String.duplicate("", Enum.join(texts) |> String.length())
     prefix = help_format(types, texts)
 
     line_us_state_code =
@@ -98,14 +100,13 @@ defmodule NOAA.Observations.Help do
         "&filler - &note"
       ])
 
-    Style.texts("#{template}", &IO.puts/1)
-    System.halt(0)
+    texts = Style.texts("#{template}")
+    Enum.each(texts, &IO.puts/1)
   end
 
-  @spec help_format([atom], [String.t()]) :: IO.chardata()
+  @spec help_format([atom], [String.t()]) :: IO.ANSI.ansidata()
   defp help_format(types, texts) do
-    types
-    |> Enum.map(&@help_attrs[&1])
+    Enum.map(types, &@help_attrs[&1])
     |> Enum.zip(texts)
     |> Enum.map(&Tuple.to_list/1)
     |> IO.ANSI.format()

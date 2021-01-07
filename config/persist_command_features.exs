@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :noaa_observations,
   aliases: [
@@ -7,6 +7,8 @@ config :noaa_observations,
     b: :bell,
     t: :table_style
   ]
+
+config :noaa_observations, default_count: 13
 
 config :noaa_observations,
   default_switches: [
@@ -32,11 +34,4 @@ config :noaa_observations,
     last: :boolean,
     bell: :boolean,
     table_style: :string
-  ]
-
-config :noaa_observations,
-  url_templates: [
-    state:
-      "https://w1.weather.gov/xml/current_obs/seek.php?state={st}&Find=Find",
-    station: "https://w1.weather.gov/xml/current_obs/display.php?stid={stn}"
   ]

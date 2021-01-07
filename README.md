@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/RaymondLoranger/noaa_observations.svg?branch=master)](https://travis-ci.org/RaymondLoranger/noaa_observations)
 
-Prints NOAA Observations to STDOUT in a table with borders and colors.
+Writes NOAA Observations to stdout in a table with borders and colors.
 
 ##### Exercise in the book [Programming Elixir](https://pragprog.com/book/elixir16/programming-elixir-1-6) by Dave Thomas.
 
