@@ -1,6 +1,6 @@
 defmodule NOAA.Observations.State do
   @moduledoc """
-  Fetches stations for a US `state`/territory.
+  Fetches the stations for a US `state`/territory.
   """
 
   alias NOAA.Observations.{Log, Message, Station, URLTemplates}
@@ -8,7 +8,7 @@ defmodule NOAA.Observations.State do
   @type t :: String.t()
 
   @doc """
-  Fetches stations for a US `state`/territory.
+  Fetches the stations for a US `state`/territory.
 
   Returns a tuple of either `{:ok, station_dict}` or `{:error, text}`.
 
