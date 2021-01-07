@@ -25,7 +25,7 @@ defmodule NOAA.Observations.Help do
     #   escript no ca -bl 9 --table-style=medium
     #   escript no fl -blt light
     # Examples of usage on macOS:
-    #   ./issues no il
+    #   ./no il
     {types, texts} =
       case :os.type() do
         {:win32, _} ->

@@ -44,7 +44,7 @@ defmodule NOAA.Observations.CLI do
   ## Switches
 
     - `-h` or `--help`        - for help
-    - `-l` or `--last`        - to format the last _n_ issues
+    - `-l` or `--last`        - to format the last _n_ observations
     - `-b` or `--bell`        - to ring the bell
     - `-t` or `--table-style` - to choose a table style
 
