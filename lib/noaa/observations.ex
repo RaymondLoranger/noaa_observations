@@ -3,7 +3,7 @@
 # └───────────────────────────────────────────────────────────┘
 defmodule NOAA.Observations do
   @moduledoc """
-  Fetches a list of weather observations for a US state/territory.
+  Fetches weather observations for a US state/territory.
   """
 
   use PersistConfig
