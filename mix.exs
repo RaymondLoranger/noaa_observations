@@ -4,14 +4,14 @@ defmodule NOAA.Observations.Mixfile do
   def project do
     [
       app: :noaa_observations,
-      version: "0.4.33",
+      version: "0.4.34",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       name: "NOAA Observations",
       source_url: source_url(),
       description: description(),
       package: package(),
-      aliases: aliases(),
+      # aliases: aliases(),
       escript: escript(),
       deps: deps(),
       # NOAA.Observations.CLI.main/1...
@@ -63,23 +63,23 @@ defmodule NOAA.Observations.Mixfile do
     ]
   end
 
-  defp aliases do
-    [
-      docs: ["docs", &copy_images/1]
-    ]
-  end
+  # defp aliases do
+  #   [
+  #     docs: ["docs", &copy_images/1]
+  #   ]
+  # end
 
-  defp copy_images(_) do
-    File.cp_r("images", "doc/images", fn src, dst ->
-      # Always true...
-      src || dst
+  # defp copy_images(_) do
+  #   File.cp_r("images", "doc/images", fn src, dst ->
+  #     # Always true...
+  #     src || dst
 
-      # IO.gets(~s|Overwriting "#{dst}" with "#{src}".\nProceed? [Yn]\s|) in [
-      #   "y\n",
-      #   "Y\n"
-      # ]
-    end)
-  end
+  #     # IO.gets(~s|Overwriting "#{dst}" with "#{src}".\nProceed? [Yn]\s|) in [
+  #     #   "y\n",
+  #     #   "Y\n"
+  #     # ]
+  #   end)
+  # end
 
   defp escript do
     [
