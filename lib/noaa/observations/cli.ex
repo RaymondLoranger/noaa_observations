@@ -52,7 +52,7 @@ defmodule NOAA.Observations.CLI do
 
   #{Style.texts("\s\s- `&arg`&filler - &note\n")}
   """
-  @spec main([String.t()]) :: :ok | no_return
+  @spec main(OptionParser.argv()) :: :ok | no_return
   def main(argv) do
     case parse(argv) do
       {state, count, bell, style} ->
@@ -103,7 +103,7 @@ defmodule NOAA.Observations.CLI do
   #     iex> CLI.parse ["nc", "0", "--table-style", "cyan"]
   #     :help
   # """
-  @spec parse([String.t()]) :: parsed
+  @spec parse(OptionParser.argv()) :: parsed
   defp parse(argv) do
     argv
     |> OptionParser.parse(strict: @strict, aliases: @aliases)
@@ -139,7 +139,9 @@ defmodule NOAA.Observations.CLI do
   #     ...> })
   #     {"st", -18, true, :dark_alt}
   # """
-  @spec to_parsed({Keyword.t(), [String.t()], [tuple]}) :: parsed
+  @spec to_parsed(
+          {OptionParser.parsed(), OptionParser.argv(), OptionParser.errors()}
+        ) :: parsed
   defp to_parsed({switches, args, []}) do
     with {state, count} <- to_tuple(args),
          %{help: false, last: last, bell: bell, table_style: table_style} <-
@@ -172,7 +174,7 @@ defmodule NOAA.Observations.CLI do
   #     iex> CLI.to_tuple(["st"])
   #     {"st", 13}
   # """
-  @spec to_tuple([String.t()]) :: {State.t(), pos_integer} | :error
+  @spec to_tuple(OptionParser.argv()) :: {State.t(), pos_integer} | :error
   defp to_tuple([state, count] = _args) do
     with {int, ""} when int > 0 <- Integer.parse(count),
          do: {String.downcase(state), int},

@@ -4,7 +4,7 @@ defmodule NOAA.Observations.Mixfile do
   def project do
     [
       app: :noaa_observations,
-      version: "0.4.35",
+      version: "0.4.36",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       name: "NOAA Observations",
@@ -14,8 +14,8 @@ defmodule NOAA.Observations.Mixfile do
       # aliases: aliases(),
       escript: escript(),
       deps: deps(),
-      # NOAA.Observations.CLI.main/1...
-      # NOAA.Observations.url/2...
+      # See NOAA.Observations.CLI.main/1...
+      # See NOAA.Observations.url/2...
       dialyzer: [plt_add_apps: [:io_ansi_table, :eex]]
     ]
   end
