@@ -61,11 +61,11 @@ defmodule NOAA.Observations.CLI do
             :ok = Message.printing(state) |> IO.ANSI.format() |> IO.puts()
             :ok = Log.info(:printing, {state, __ENV__})
             options = [count: count, bell: bell, style: style]
-            :ok = Table.write(observations, @table_spec, options)
+            :ok = Table.write(@table_spec, observations, options)
 
           {:error, text} ->
             :ok = Message.error(state, text) |> IO.ANSI.format() |> IO.puts()
-            :ok = Log.error(:fetching, {text, state})
+            :ok = Log.error(:fetching, {text, state, __ENV__})
             System.stop(1)
         end
 

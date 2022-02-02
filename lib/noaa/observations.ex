@@ -47,7 +47,7 @@ defmodule NOAA.Observations do
         |> Enum.map(&Task.await/1)
         |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
         |> case do
-          %{error: errors} -> {:error, List.first(errors)}
+          %{error: errors} -> {:error, hd(errors)}
           %{ok: observations} -> {:ok, observations}
           %{} -> {:ok, []}
         end

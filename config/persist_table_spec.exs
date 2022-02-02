@@ -12,4 +12,4 @@ options = [
 ]
 
 config :noaa_observations,
-  table_spec: Spec.new(headers, options) |> Spec.extend()
+  table_spec: Spec.new(headers, options) |> Spec.develop()

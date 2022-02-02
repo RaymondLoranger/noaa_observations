@@ -26,7 +26,7 @@ defmodule NOAA.Observations.Mixfile do
 
   defp description do
     """
-    Writes NOAA Observations to stdout in a table with borders and colors.
+    Writes NOAA Observations to "stdio" in a table with borders and colors.
     """
   end
 
