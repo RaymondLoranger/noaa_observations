@@ -9,13 +9,13 @@ defmodule NOAA.Observations.State do
   @type code :: String.t()
 
   @doc """
-  Fetches the stations for a US state/territory code.
+  Fetches the stations for a US state/territory `code`.
 
   Returns a tuple of either `{:ok, station_names}` or `{:error, text}`.
 
   ## Parameters
 
-    - `state_code`    - US state/territory code
+    - `code`          - US state/territory code
     - `url_templates` - URL templates
 
   ## Examples
