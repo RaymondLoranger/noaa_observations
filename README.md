@@ -16,7 +16,7 @@ To use `NOAA Observations` locally, run these commands:
   - `mix escript.build`
   - `mix escript.install`
 
-You can now run the application like so on Windows:
+You can now run the application like so:
 
   - `no --help`
   - `no ny 9 -blt dark`
