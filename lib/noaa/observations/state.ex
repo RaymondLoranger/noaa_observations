@@ -11,7 +11,7 @@ defmodule NOAA.Observations.State do
   @doc """
   Fetches the stations for a US state/territory `code`.
 
-  Returns a tuple of either `{:ok, station_names}` or `{:error, text}`.
+  Returns a tuple of either `{:ok, [station]}` or `{:error, text}`.
 
   ## Parameters
 
