@@ -1,15 +1,15 @@
 defmodule NOAA.Observations.URLTemplates do
   @moduledoc """
-  Returns a URL based on `url_templates` and `station` or `state`.
+  Returns a URL based on URL templates and a station ID or state code.
   """
 
   @doc """
-  Returns a URL based on `url_templates` and `station` or `state`.
+  Returns a URL based on `url_templates` and a station `id` or state `code`.
 
   ## Parameters
 
     - `url_templates` - keyword of EEx strings
-    - `keyword`       - [station: `station`] or [state: `state`]
+    - `keyword`       - [station: `id`] or [state: `code`]
 
   ## Examples
 
@@ -31,11 +31,11 @@ defmodule NOAA.Observations.URLTemplates do
       "weather.gc.ca/forecast/canada/index_e.html?id=qc"
   """
   @spec url(Keyword.t(), Keyword.t()) :: String.t()
-  def url(url_templates, station: station) do
-    EEx.eval_string(url_templates[:station], station: station)
+  def url(url_templates, station: id) do
+    EEx.eval_string(url_templates[:station], station: id)
   end
 
-  def url(url_templates, state: state) do
-    EEx.eval_string(url_templates[:state], state: state)
+  def url(url_templates, state: code) do
+    EEx.eval_string(url_templates[:state], state: code)
   end
 end

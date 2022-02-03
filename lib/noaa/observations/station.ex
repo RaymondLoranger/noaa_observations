@@ -1,24 +1,28 @@
 defmodule NOAA.Observations.Station do
   @moduledoc """
-  Fetches the latest observation for a given NOAA `station`.
+  Fetches the latest observation for a given NOAA station.
   """
 
   alias NOAA.Observations.{Log, Message, URLTemplates}
 
-  @type dict :: %{t => name}
+  @typedoc "Station ID"
+  @type id :: String.t()
+  @typedoc "Station name"
   @type name :: String.t()
-  @type obs :: map
-  @type t :: String.t()
+  @typedoc "NOAA weather observation"
+  @type observation :: map
+  @typedoc "NOAA station"
+  @type t :: {id, name}
 
   @doc """
   Fetches the latest observation for a given NOAA `station`.
 
-  Returns a tuple of either `{:ok, obs}` or `{:error, text}`.
+  Returns either tuple `{:ok, observation}` or tuple `{:error, text}`.
 
   ## Parameters
 
-    - `{station, name}` - NOAA station
-    - `url_templates`   - URL templates
+    - `{id, name}`    - NOAA station
+    - `url_templates` - URL templates
 
   ## Examples
 
@@ -28,9 +32,11 @@ defmodule NOAA.Observations.Station do
       ...>     "https://w1.weather.gov/xml/current_obs/display.php?stid=" <>
       ...>       "<%=station%>"
       ...> ]
-      iex> {:ok, obs} = Station.obs({"KFSO", "KFSO name"}, url_templates)
-      iex> is_map(obs) and
-      ...> is_binary(obs["temp_c"]) and is_binary(obs["wind_mph"])
+      iex> {:ok, observation} =
+      ...>   Station.observation({"KFSO", "KFSO name"}, url_templates)
+      iex> is_map(observation) and
+      ...> is_binary(observation["temp_c"]) and
+      ...> is_binary(observation["wind_mph"])
       true
 
       iex> alias NOAA.Observations.Station
@@ -39,7 +45,8 @@ defmodule NOAA.Observations.Station do
       ...>     "htp://w1.weather.gov/xml/current_obs/display.php?stid=" <>
       ...>       "<%=station%>"
       ...> ]
-      iex> {:error, text} = Station.obs({"KFSO", "KFSO name"}, url_templates)
+      iex> {:error, text} =
+      ...>   Station.observation({"KFSO", "KFSO name"}, url_templates)
       iex> text
       "reason => :nxdomain"
 
@@ -49,14 +56,16 @@ defmodule NOAA.Observations.Station do
       ...>     "https://w1.weather.gov/xml/past_obs/display.php?stid=" <>
       ...>       "<%=station%>"
       ...> ]
-      iex> {:error, text} = Station.obs({"KFSO", "KFSO name"}, url_templates)
+      iex> {:error, text} =
+      ...>   Station.observation({"KFSO", "KFSO name"}, url_templates)
       iex> text
       "status code 404 ⇒ Not Found"
   """
-  @spec obs({t, name}, Keyword.t()) :: {:ok, obs} | {:error, String.t()}
-  def obs({station, name}, url_templates) do
-    url = URLTemplates.url(url_templates, station: station)
-    :ok = Log.info(:fetching_observation, {station, name, url, __ENV__})
+  @spec observation(t, Keyword.t()) ::
+          {:ok, observation} | {:error, String.t()}
+  def observation({id, name} = _station, url_templates) do
+    url = URLTemplates.url(url_templates, station: id)
+    :ok = Log.info(:fetching_observation, {id, name, url, __ENV__})
 
     case HTTPoison.get(url) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->

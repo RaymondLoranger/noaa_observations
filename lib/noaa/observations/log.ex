@@ -2,52 +2,52 @@ defmodule NOAA.Observations.Log do
   use File.Only.Logger
   use PersistConfig
 
-  @state_dict get_env(:state_dict)
+  @state_names get_env(:state_names)
 
-  error :fetching, {text, state, env} do
+  error :fetching_error, {code, text, env} do
     """
-    \nError fetching the weather observations of a state...
+    \nError fetching weather observations of a state...
     • Error: #{text}
-    • State: #{state}
-    • Name: #{@state_dict[state] || "?"}
+    • State: #{code}
+    • Name: #{@state_names[code] || "???"}
     #{from(env, __MODULE__)}
     """
   end
 
-  info :printing, {state, env} do
+  info :writing_table, {code, env} do
     """
-    \nPrinting the weather observations of a state...
-    • State: #{state}
-    • Name: #{@state_dict[state] || "?"}
+    \nWriting table of weather observations for a state...
+    • State: #{code}
+    • Name: #{@state_names[code] || "???"}
     #{from(env, __MODULE__)}
     """
   end
 
-  info :fetching_stations, {state, url, env} do
+  info :fetching_stations, {code, url, env} do
     """
     \nFetching the stations of a state...
     • URL: #{url}
-    • State: #{state}
-    • Name: #{@state_dict[state] || "?"}
+    • State: #{code}
+    • Name: #{@state_names[code] || "???"}
     #{from(env, __MODULE__)}
     """
   end
 
-  info :fetching_observation, {station, name, url, env} do
+  info :fetching_observation, {code, name, url, env} do
     """
     \nFetching the latest observation of a station...
     • URL: #{url}
-    • Station: #{station}
+    • Station: #{code}
     • Name: #{name}
     #{from(env, __MODULE__)}
     """
   end
 
-  info :fetching_observations, {state, env} do
+  info :fetching_observations, {code, env} do
     """
     \nFetching the weather observations of a state...
-    • State: #{state}
-    • Name: #{@state_dict[state] || "?"}
+    • State: #{code}
+    • Name: #{@state_names[code] || "???"}
     #{from(env, __MODULE__)}
     """
   end

@@ -1,20 +1,21 @@
 defmodule NOAA.Observations.State do
   @moduledoc """
-  Fetches the stations for a US `state`/territory.
+  Fetches the stations for a US state/territory code.
   """
 
   alias NOAA.Observations.{Log, Message, Station, URLTemplates}
 
-  @type t :: String.t()
+  @typedoc "US state/territory code"
+  @type code :: String.t()
 
   @doc """
-  Fetches the stations for a US `state`/territory.
+  Fetches the stations for a US state/territory code.
 
-  Returns a tuple of either `{:ok, station_dict}` or `{:error, text}`.
+  Returns a tuple of either `{:ok, station_names}` or `{:error, text}`.
 
   ## Parameters
 
-    - `state`         - US state/territory code
+    - `state_code`    - US state/territory code
     - `url_templates` - URL templates
 
   ## Examples
@@ -25,7 +26,8 @@ defmodule NOAA.Observations.State do
       ...>     "https://w1.weather.gov/xml/current_obs/seek.php?state=" <>
       ...>       "<%=state%>&Find=Find"
       ...> ]
-      iex> {:ok, %{"KFSO" => name}} = State.stations("vt", url_templates)
+      iex> {:ok, stations} = State.stations("vt", url_templates)
+      iex> %{"KFSO" => name} = Map.new(stations)
       iex> name
       "Franklin County State Airport"
 
@@ -75,20 +77,19 @@ defmodule NOAA.Observations.State do
       iex> text
       "reason => :econnrefused"
   """
-  @spec stations(t, Keyword.t()) ::
-          {:ok, Station.dict()} | {:error, String.t()}
-  def stations(state, url_templates) do
-    url = URLTemplates.url(url_templates, state: state)
-    :ok = Log.info(:fetching_stations, {state, url, __ENV__})
+  @spec stations(code, Keyword.t()) ::
+          {:ok, [Station.t]} | {:error, String.t()}
+  def stations(code, url_templates) do
+    url = URLTemplates.url(url_templates, state: code)
+    :ok = Log.info(:fetching_stations, {code, url, __ENV__})
 
     case HTTPoison.get(url) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         {
           :ok,
-          # <a href="display.php?stid=KCDA">Caledonia County Airport</a>
-          ~r[<a href=".*?stid=(.*?)">(.*?)</a>] # capture station and name
+          ~r[<a href=".*?stid=(.*?)">(.*?)</a>] # capture station ID and name
           |> Regex.scan(body, capture: :all_but_first) # i.e. only subpatterns
-          |> Map.new(&List.to_tuple/1) # each [station, name] -> {station, name}
+          |> Enum.map(&List.to_tuple/1) # each [id, name] -> {id, name}
         }
 
       {:ok, %HTTPoison.Response{status_code: code}} ->

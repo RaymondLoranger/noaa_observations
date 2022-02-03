@@ -3,7 +3,7 @@ defmodule NOAA.Observations.Message do
 
   alias NOAA.Observations.State
 
-  @state_dict get_env(:state_dict)
+  @state_names get_env(:state_names)
   @table_spec get_env(:table_spec)
 
   @spec status(pos_integer) :: String.t()
@@ -16,21 +16,25 @@ defmodule NOAA.Observations.Message do
   @spec error(term) :: String.t()
   def error(reason), do: "reason => #{inspect(reason)}"
 
-  @spec error(State.t(), String.t()) :: IO.ANSI.ansilist()
-  def error(state, text) do
-    [
-      [:light_green, "Error fetching NOAA observations for "],
-      [:italic, "#{state}...\n"],
-      [:light_yellow, text]
-    ]
-  end
-
-  @spec printing(State.t()) :: IO.ANSI.ansilist()
-  def printing(state) do
+  @spec writing_table(State.code()) :: :ok
+  def writing_table(code) do
     [
       @table_spec.left_margin,
-      [:light_green, "Printing NOAA observations for "],
-      [:italic, "#{@state_dict[state] || "?"}..."]
+      [:white, "Writing table of weather observations for "],
+      [:light_white, "#{@state_names[code] || "???"}..."]
     ]
+    |> IO.ANSI.format()
+    |> IO.puts()
+  end
+
+  @spec fetching_error(State.code(), String.t()) :: :ok
+  def fetching_error(code, text) do
+    [
+      [:white, "Error fetching weather observations of "],
+      [:light_white, "#{@state_names[code] || "???"}..."],
+      [:light_yellow, :string.titlecase(text)]
+    ]
+    |> IO.ANSI.format()
+    |> IO.puts()
   end
 end

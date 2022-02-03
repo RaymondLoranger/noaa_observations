@@ -1,7 +1,7 @@
 import Config
 
 config :noaa_observations,
-  state_dict: %{
+  state_names: %{
     "al" => "Alabama",
     "ak" => "Alaska",
     "as" => "American Samoa",

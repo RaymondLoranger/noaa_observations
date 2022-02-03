@@ -3,7 +3,7 @@
 # └───────────────────────────────────────────────────────────┘
 defmodule NOAA.Observations do
   @moduledoc """
-  Fetches weather observations for a US state/territory.
+  Fetches weather observations for a US state/territory code.
   """
 
   use PersistConfig
@@ -13,13 +13,13 @@ defmodule NOAA.Observations do
   @url_templates get_env(:url_templates)
 
   @doc """
-  Fetches weather observations for a US `state`/territory.
+  Fetches weather observations for a US state/territory `code`.
 
-  Returns a tuple of either `{:ok, [obs]}` or `{:error, text}`.
+  Returns either tuple `{:ok, [observation]}` or tuple `{:error, text}`.
 
   ## Parameters
 
-    - `state`         - US state/territory code
+    - `code`          - US state/territory code
     - `url_templates` - URL templates (keyword)
 
   ## URL templates
@@ -34,16 +34,16 @@ defmodule NOAA.Observations do
       iex> Enum.all?(observations, &is_map/1) and length(observations) > 0
       true
   """
-  @spec fetch(State.t(), Keyword.t()) ::
-          {:ok, [Station.obs()]} | {:error, String.t()}
-  def fetch(state, url_templates \\ @url_templates) do
-    :ok = Log.info(:fetching_observations, {state, __ENV__})
+  @spec fetch(State.code(), Keyword.t()) ::
+          {:ok, [Station.observation()]} | {:error, String.t()}
+  def fetch(code, url_templates \\ @url_templates) do
+    :ok = Log.info(:fetching_observations, {code, __ENV__})
     url_templates = Keyword.merge(@url_templates, url_templates)
 
-    case State.stations(state, url_templates) do
+    case State.stations(code, url_templates) do
       {:ok, stations} ->
         stations
-        |> Enum.map(&Task.async(Station, :obs, [&1, url_templates]))
+        |> Enum.map(&Task.async(Station, :observation, [&1, url_templates]))
         |> Enum.map(&Task.await/1)
         |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
         |> case do

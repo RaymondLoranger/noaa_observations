@@ -1,6 +1,6 @@
 defmodule NOAA.Observations.Help do
   @moduledoc """
-  Prints info on the command's usage and syntax.
+  Prints info on the escript command's usage and syntax.
   """
 
   use PersistConfig
@@ -13,31 +13,21 @@ defmodule NOAA.Observations.Help do
   @switches get_env(:default_switches)
 
   @doc """
-  Prints info on the command's usage and syntax.
+  Prints info on the escript command's usage and syntax.
   """
   @spec show_help() :: :ok
   def show_help() do
-    # Examples of usage on Windows:
-    #   escript no --help
-    #   escript no vt 7 --last
-    #   escript no tx --bell
-    #   escript no ny -lb 8 -t green-border
-    #   escript no ca -bl 9 --table-style=medium
-    #   escript no fl -blt light
-    # Examples of usage on macOS:
-    #   ./no il
-    {types, texts} =
-      case :os.type() do
-        {:win32, _} ->
-          {[:section, :normal, :command, :normal],
-           ["usage:", " ", "escript", " #{@escript}"]}
-
-        {:unix, _} ->
-          {[:section, :normal], ["usage:", " ./#{@escript}"]}
-      end
-
-    filler = String.duplicate("", Enum.join(texts) |> String.length())
-    prefix = help_format(types, texts)
+    # Examples of usage:
+    #   no --help
+    #   no vt 7 --last
+    #   no tx --bell
+    #   no ny -lb 8 -t green-border
+    #   no ca -bl 9 --table-style=medium
+    #   no fl -blt light
+    #   no il
+    texts = ["usage:", " #{@escript}"]
+    filler = String.pad_leading("", Enum.join(texts) |> String.length())
+    prefix = help_format([:section, :normal], texts)
 
     line_us_state_code =
       help_format([:switch, :arg], ["[(-h | --help)] ", "<us-state-code>"])
@@ -103,6 +93,8 @@ defmodule NOAA.Observations.Help do
     texts = Style.texts("#{template}")
     Enum.each(texts, &IO.puts/1)
   end
+
+  ## Private functions
 
   @spec help_format([atom], [String.t()]) :: IO.ANSI.ansidata()
   defp help_format(types, texts) do
