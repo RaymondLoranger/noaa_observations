@@ -9,7 +9,7 @@ defmodule NOAA.Observations.URLTemplates do
   ## Parameters
 
     - `url_templates` - keyword of EEx strings
-    - `keyword`       - [station: `id`] or [state: `code`]
+    - `options`       - [station: `id`] or [state: `code`]
 
   ## Examples
 
@@ -31,6 +31,8 @@ defmodule NOAA.Observations.URLTemplates do
       "weather.gc.ca/forecast/canada/index_e.html?id=qc"
   """
   @spec url(Keyword.t(), Keyword.t()) :: String.t()
+  def url(url_templates, options)
+
   def url(url_templates, station: id) do
     EEx.eval_string(url_templates[:station], station: id)
   end
