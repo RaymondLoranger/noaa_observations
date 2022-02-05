@@ -30,7 +30,7 @@ defmodule NOAA.Observations.CLI do
   (case-insensitive) and optionally the number of observations
   to format (the first _n_ ones).
   To format the last _n_ observations, specify switch `--last`.
-  To ring the bell, specify switch `--bell`.
+  To ring the bell, specify switch `--&#160bell`.
   To choose a table style, specify switch `--table-style`.
 
   ## Parameters
