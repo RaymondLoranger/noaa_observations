@@ -30,7 +30,10 @@ defmodule NOAA.Observations.Help do
     prefix = help_format([:section, :normal], texts)
 
     line_us_state_code =
-      help_format([:switch, :arg], ["[(-h | --help)] ", "<us-state-code>"])
+      help_format([:switch, :arg], [
+        "[(-h | --help)] ",
+        "<us-state-or-territory-code>"
+      ])
 
     line_count =
       help_format([:switch, :normal, :arg, :normal, :switch], [
