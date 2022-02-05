@@ -27,6 +27,7 @@ defmodule NOAA.Observations.CLI do
 
   `argv` can be "-h" or "--help", which prints info on the command's
   usage and syntax. Otherwise it is a US state/territory code
+  (case-insensitive) and optionally the number of observations
   to format (the first _n_ ones).
   To format the last _n_ observations, specify switch `--last`.
   To ring the bell, specify switch `--bell`.
