@@ -1,6 +1,6 @@
 import Config
 
-config :github_issues,
+config :noaa_observations,
   help_attrs: %{
     arg: :light_cyan,
     normal: :reset,
