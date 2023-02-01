@@ -99,7 +99,7 @@ defmodule NOAA.Observations.Help do
 
   ## Private functions
 
-  @spec help_format([atom], [String.t()]) :: IO.ANSI.ansidata()
+  @spec help_format([atom], [String.t()]) :: IO.chardata()
   defp help_format(types, texts) do
     Enum.map(types, &@help_attrs[&1])
     |> Enum.zip(texts)
