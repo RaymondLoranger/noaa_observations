@@ -9,7 +9,7 @@ defmodule NOAA.Observations.Log do
     \nError fetching weather observations of a state...
     • Error: #{text}
     • State: #{code}
-    • Name: #{@state_names[code] || "???"}
+    • State name: #{@state_names[code] || "???"}
     #{from(env, __MODULE__)}
     """
   end
@@ -18,7 +18,7 @@ defmodule NOAA.Observations.Log do
     """
     \nWriting table of weather observations for a state...
     • State: #{code}
-    • Name: #{@state_names[code] || "???"}
+    • State name: #{@state_names[code] || "???"}
     #{from(env, __MODULE__)}
     """
   end
@@ -28,17 +28,19 @@ defmodule NOAA.Observations.Log do
     \nFetching the stations of a state...
     • URL: #{url}
     • State: #{code}
-    • Name: #{@state_names[code] || "???"}
+    • State name: #{@state_names[code] || "???"}
     #{from(env, __MODULE__)}
     """
   end
 
-  info :fetching_observation, {code, name, url, env} do
+  info :fetching_observation, {id, name, code, url, env} do
     """
     \nFetching the latest observation of a station...
     • URL: #{url}
-    • Station: #{code}
-    • Name: #{name}
+    • Station: #{id}
+    • Station name: #{maybe_break(name, 16)}
+    • State: #{code}
+    • State name: #{@state_names[code] || "???"}
     #{from(env, __MODULE__)}
     """
   end
@@ -47,7 +49,7 @@ defmodule NOAA.Observations.Log do
     """
     \nFetching the weather observations of a state...
     • State: #{code}
-    • Name: #{@state_names[code] || "???"}
+    • State name: #{@state_names[code] || "???"}
     #{from(env, __MODULE__)}
     """
   end

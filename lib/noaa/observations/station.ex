@@ -3,7 +3,7 @@ defmodule NOAA.Observations.Station do
   Fetches the latest observation for a given NOAA station.
   """
 
-  alias NOAA.Observations.{Log, Message, URLTemplates}
+  alias NOAA.Observations.{Log, Message, State, URLTemplates}
 
   @typedoc "Station ID"
   @type id :: String.t()
@@ -33,7 +33,7 @@ defmodule NOAA.Observations.Station do
       ...>       "<%=station%>"
       ...> ]
       iex> {:ok, observation} =
-      ...>   Station.observation({"KFSO", "KFSO name"}, url_templates)
+      ...>   Station.observation({"KFSO", "KFSO name"}, "vt", url_templates)
       iex> is_map(observation) and
       ...> is_binary(observation["temp_c"]) and
       ...> is_binary(observation["wind_mph"])
@@ -46,7 +46,7 @@ defmodule NOAA.Observations.Station do
       ...>       "<%=station%>"
       ...> ]
       iex> {:error, text} =
-      ...>   Station.observation({"KFSO", "KFSO name"}, url_templates)
+      ...>   Station.observation({"KFSO", "KFSO name"}, "vt", url_templates)
       iex> text
       "reason => :nxdomain"
 
@@ -57,15 +57,15 @@ defmodule NOAA.Observations.Station do
       ...>       "<%=station%>"
       ...> ]
       iex> {:error, text} =
-      ...>   Station.observation({"KFSO", "KFSO name"}, url_templates)
+      ...>   Station.observation({"KFSO", "KFSO name"}, "vt", url_templates)
       iex> text
       "status code 404 ⇒ Not Found"
   """
-  @spec observation(t, Keyword.t()) ::
+  @spec observation(t, State.code, Keyword.t()) ::
           {:ok, observation} | {:error, String.t()}
-  def observation({id, name} = _station, url_templates) do
+  def observation({id, name} = _station, code, url_templates) do
     url = URLTemplates.url(url_templates, station: id)
-    :ok = Log.info(:fetching_observation, {id, name, url, __ENV__})
+    :ok = Log.info(:fetching_observation, {id, name, code, url, __ENV__})
 
     case HTTPoison.get(url) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->

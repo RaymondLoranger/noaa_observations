@@ -8,6 +8,8 @@ defmodule NOAA.Observations do
 
   use PersistConfig
 
+  import Task, only: [async: 3, await: 1]
+
   alias __MODULE__.{Log, State, Station}
 
   require Logger
@@ -34,10 +36,10 @@ defmodule NOAA.Observations do
     case State.stations(code, @url_templates) do
       {:ok, stations} ->
         stations
-        |> remove_console()
-        |> Enum.map(&Task.async(Station, :observation, [&1, @url_templates]))
-        |> Enum.map(&Task.await/1)
-        |> add_console()
+        |> tap(fn _stations -> Logger.remove_backend(:console) end)
+        |> Enum.map(&async(Station, :observation, [&1, code, @url_templates]))
+        |> Enum.map(&await/1)
+        |> tap(fn _observations -> Logger.add_backend(:console) end)
         |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
         |> case do
           %{error: errors} -> {:error, hd(errors)}
@@ -48,17 +50,5 @@ defmodule NOAA.Observations do
       {:error, text} ->
         {:error, text}
     end
-  end
-
-  ## Private functions
-
-  defp remove_console(stations) do
-    Logger.remove_backend(:console)
-    stations
-  end
-
-  defp add_console(observations) do
-    Logger.add_backend(:console)
-    observations
   end
 end
