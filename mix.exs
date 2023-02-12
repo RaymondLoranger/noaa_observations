@@ -4,7 +4,7 @@ defmodule NOAA.Observations.Mixfile do
   def project do
     [
       app: :noaa_observations,
-      version: "0.4.50",
+      version: "0.4.51",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       name: "NOAA Observations",
@@ -53,7 +53,7 @@ defmodule NOAA.Observations.Mixfile do
     [
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
-      {:file_only_logger, "~> 0.1"},
+      {:file_only_logger, "~> 0.2"},
       {:httpoison, "~> 2.0"},
       {:io_ansi_table, "~> 1.0"},
       {:log_reset, "~> 0.1"},

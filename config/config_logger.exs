@@ -9,7 +9,7 @@ config :logger, :console,
     error: :light_red
   ]
 
-format = "$date $time [$level] $levelpad$message\n"
+format = "$date $time [$level] $message\n"
 cwd = File.cwd!()
 
 debug_path = "#{cwd}/log/debug.log"
