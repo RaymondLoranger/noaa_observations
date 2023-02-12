@@ -10,6 +10,8 @@ defmodule NOAA.Observations do
 
   alias __MODULE__.{Log, State, Station}
 
+  require Logger
+
   @url_templates get_env(:url_templates)
 
   @doc """
@@ -32,8 +34,10 @@ defmodule NOAA.Observations do
     case State.stations(code, @url_templates) do
       {:ok, stations} ->
         stations
+        |> remove_console()
         |> Enum.map(&Task.async(Station, :observation, [&1, @url_templates]))
         |> Enum.map(&Task.await/1)
+        |> add_console()
         |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
         |> case do
           %{error: errors} -> {:error, hd(errors)}
@@ -44,5 +48,17 @@ defmodule NOAA.Observations do
       {:error, text} ->
         {:error, text}
     end
+  end
+
+  ## Private functions
+
+  defp remove_console(stations) do
+    Logger.remove_backend(:console)
+    stations
+  end
+
+  defp add_console(observations) do
+    Logger.add_backend(:console)
+    observations
   end
 end

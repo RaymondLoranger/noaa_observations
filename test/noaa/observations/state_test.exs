@@ -1,5 +1,6 @@
 defmodule NOAA.Observations.StateTest do
-  use ExUnit.Case, async: true
+  # To ensure file only logging.
+  use ExUnit.Case, async: false
 
   alias NOAA.Observations.State
 
