@@ -10,17 +10,21 @@ Writes NOAA Observations to `:stdio` in a table with borders and colors.
 
 To use `NOAA Observations` locally, run these commands:
 
-  - `git clone https://github.com/RaymondLoranger/noaa_observations`
-  - `cd noaa_observations`
-  - `mix deps.get`
-  - `mix escript.build`
-  - `mix escript.install`
+```
+git clone https://github.com/RaymondLoranger/noaa_observations
+cd noaa_observations
+mix deps.get
+mix escript.build
+mix escript.install
+```
 
 You can now run the application like so:
 
-  - `no --help`
-  - `no ny 9 -blt dark`
-  - `no ny 9 --last --table-style=dark`
+```
+no --help
+no ny 9 -blt dark
+no ny 9 --last --table-style=dark
+```
 
 ## Examples
 ## ![pretty](images/pretty.png)
