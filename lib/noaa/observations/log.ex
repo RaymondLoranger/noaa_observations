@@ -10,7 +10,7 @@ defmodule NOAA.Observations.Log do
     • Error: #{text}
     • State: #{code}
     • State name: #{@state_names[code] || "???"}
-    #{from(env, __MODULE__)}
+    #{from(env, __MODULE__)}\
     """
   end
 
@@ -19,7 +19,7 @@ defmodule NOAA.Observations.Log do
     \nWriting table of weather observations for a state...
     • State: #{code}
     • State name: #{@state_names[code] || "???"}
-    #{from(env, __MODULE__)}
+    #{from(env, __MODULE__)}\
     """
   end
 
@@ -29,7 +29,7 @@ defmodule NOAA.Observations.Log do
     • URL: #{url}
     • State: #{code}
     • State name: #{@state_names[code] || "???"}
-    #{from(env, __MODULE__)}
+    #{from(env, __MODULE__)}\
     """
   end
 
@@ -41,7 +41,7 @@ defmodule NOAA.Observations.Log do
     • Station name: #{maybe_break(name, 16)}
     • State: #{code}
     • State name: #{@state_names[code] || "???"}
-    #{from(env, __MODULE__)}
+    #{from(env, __MODULE__)}\
     """
   end
 
@@ -50,7 +50,7 @@ defmodule NOAA.Observations.Log do
     \nFetching the weather observations of a state...
     • State: #{code}
     • State name: #{@state_names[code] || "???"}
-    #{from(env, __MODULE__)}
+    #{from(env, __MODULE__)}\
     """
   end
 end

@@ -36,10 +36,16 @@ defmodule NOAA.Observations do
     case State.stations(code, @url_templates) do
       {:ok, stations} ->
         stations
-        |> tap(fn _stations -> Logger.remove_backend(:console) end)
+        # |> tap(fn _stations ->
+        #   # Prevent console messages...
+        #   :ok = :logger.set_handler_config(:default, :level, :none)
+        # end)
         |> Enum.map(&async(Station, :observation, [&1, code, @url_templates]))
         |> Enum.map(&await/1)
-        |> tap(fn _observations -> Logger.add_backend(:console) end)
+        # |> tap(fn _observations ->
+        #   # Allow console messages...
+        #   :ok = :logger.set_handler_config(:default, :level, Logger.level())
+        # end)
         |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
         |> case do
           %{error: errors} -> {:error, hd(errors)}

@@ -4,7 +4,7 @@ defmodule NOAA.Observations.Mixfile do
   def project do
     [
       app: :noaa_observations,
-      version: "0.4.54",
+      version: "0.4.55",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
       name: "NOAA Observations",
@@ -43,8 +43,8 @@ defmodule NOAA.Observations.Mixfile do
   def application do
     [
       # Only using the `IO.ANSI.Table.write/3` function.
-      included_applications: [:io_ansi_table, :eex],
-      extra_applications: [:logger]
+      included_applications: [:io_ansi_table],
+      extra_applications: [:logger, :observer, :wx, :runtime_tools]
     ]
   end
 
@@ -54,9 +54,12 @@ defmodule NOAA.Observations.Mixfile do
       {:dialyxir, "~> 1.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.22", only: :dev, runtime: false},
       {:file_only_logger, "~> 0.2"},
+      # {:file_only_logger, path: "../file_only_logger"},
       {:httpoison, "~> 2.0"},
       {:io_ansi_table, "~> 1.0"},
+      # {:io_ansi_table, path: "../io_ansi_table"},
       {:log_reset, "~> 0.1"},
+      # {:log_reset, path: "../log_reset"},
       {:persist_config, "~> 0.4", runtime: false}
     ]
   end

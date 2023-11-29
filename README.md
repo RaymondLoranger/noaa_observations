@@ -1,7 +1,5 @@
 # NOAA Observations
 
-[![Build Status](https://travis-ci.org/RaymondLoranger/noaa_observations.svg?branch=master)](https://travis-ci.org/RaymondLoranger/noaa_observations)
-
 Writes NOAA Observations to `:stdio` in a table with borders and colors.
 
 ##### Exercise in the book [Programming Elixir](https://pragprog.com/book/elixir16/programming-elixir-1-6) by Dave Thomas.
