@@ -1,0 +1,25 @@
+%IO.ANSI.Table.Spec{
+  spec_name: "io_ansi_table",
+  headers: ["weather", "temperature_string", "wind_mph", "wind_dir",
+   "station_id", "location"],
+  align_specs: [right: "wind_mph"],
+  bell: false,
+  count: 11,
+  header_fixes: %{
+    ~r/ mph$/i => " MPH",
+    "Station Id" => "Stn",
+    "Temperature String" => "Temperature"
+  },
+  margins: [top: 0, bottom: 0, left: 1],
+  max_width: 99,
+  sort_specs: [desc: "temperature_string", asc: "wind_mph"],
+  sort_symbols: [asc: "↑", desc: "↓", pos: :trailing],
+  style: :plain,
+  align_attrs: [nil, nil, :right, nil, nil, nil],
+  headings: ["Weather", "Temperature↓", "Wind MPH↑", "Wind Dir", "Stn",
+   "Location"],
+  left_margin: "\e[1C",
+  sort_attrs: [nil, :desc, :asc, nil, nil, nil],
+  column_widths: [],
+  rows: []
+}
