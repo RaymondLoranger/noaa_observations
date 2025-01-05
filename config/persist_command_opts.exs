@@ -1,6 +1,6 @@
 import Config
 
-config :noaa_observations, default_count: "13"
+config :noaa_observations, default_count: "22"
 
 config :noaa_observations,
   default_switches: %{

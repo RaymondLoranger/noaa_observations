@@ -1,11 +1,14 @@
 import Config
 
+scheme = "https"
+host = "forecast.weather.gov"
+state_path = "/xml/current_obs/seek.php"
+station_path = "/xml/current_obs/display.php"
+state_query = "state=<%=state_code%>&Find=Find"
+station_query = "stid=<%=station_id%>"
+
 config :noaa_observations,
-  url_templates: [
-    state:
-      "https://w1.weather.gov/xml/current_obs/seek.php?state=" <>
-        "<%=state%>&Find=Find",
-    station:
-      "https://w1.weather.gov/xml/current_obs/display.php?stid=" <>
-        "<%=station%>"
-  ]
+  url_templates: %{
+    state: "#{scheme}://#{host}#{state_path}?#{state_query}",
+    station: "#{scheme}://#{host}#{station_path}?#{station_query}"
+  }
