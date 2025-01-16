@@ -19,10 +19,9 @@ defmodule NOAA.Observations.CLI do
   @count get_env(:default_count)
   @options get_env(:parsing_options)
   @switches get_env(:default_switches)
-  @table_spec get_env(:table_spec)
-  @error_spec get_env(:error_spec)
-  @fault_spec get_env(:fault_spec)
-  @templates get_env(:url_templates)
+  @observations_spec get_env(:observations_spec)
+  @stations_spec get_env(:stations_spec)
+  @state_spec get_env(:state_spec)
 
   @doc """
   Parses the command line and prints a table of weather observations
@@ -87,7 +86,7 @@ defmodule NOAA.Observations.CLI do
   @dialyzer {:nowarn_function, [write_table: 2]}
   @spec write_table(State.code(), Keyword.t()) :: :ok
   defp write_table(state_code, options) do
-    case Observations.fetch(state_code, @templates.state, options) do
+    case Observations.fetch(state_code, options) do
       %{error: errors, ok: observations} ->
         :ok = write_table(:error, errors, options, state_code)
         :ok = write_table(:ok, observations, options, state_code)
@@ -95,11 +94,11 @@ defmodule NOAA.Observations.CLI do
       %{ok: observations} ->
         :ok = write_table(:ok, observations, options, state_code)
 
-      %{error: errors} ->
+      %{error: errors} when is_list(errors) ->
         :ok = write_table(:error, errors, options, state_code)
 
-      {:fault, error} ->
-        :ok = write_table(:fault, error, options, state_code)
+      {:error, error} ->
+        :ok = write_table(:error, error, options, state_code)
 
       _empty_map ->
         :ok = write_table(:ok, [], options, state_code)
@@ -107,19 +106,19 @@ defmodule NOAA.Observations.CLI do
   end
 
   @dialyzer {:nowarn_function, [write_table: 4]}
-  @spec write_table(:fault, State.fault(), Keyword.t(), State.code()) :: :ok
-  defp write_table(:fault, fault, options, code) do
-    :ok = Message.fetching_error(code)
-    # :ok = Message.writing_table(:error, code)
-    :ok = Log.info(:writing_table, {:error, code, __ENV__})
-    :ok = Table.write(@fault_spec, [fault], options)
-  end
-
   @spec write_table(:error, [Station.error()], Keyword.t(), State.code()) :: :ok
-  defp write_table(:error, errors, options, code) do
+  defp write_table(:error, errors, options, code) when is_list(errors) do
     :ok = Message.writing_table(:error, code)
     :ok = Log.info(:writing_table, {:error, code, __ENV__})
-    :ok = Table.write(@error_spec, errors, options)
+    :ok = Table.write(@stations_spec, errors, options)
+  end
+
+  @spec write_table(:error, State.error(), Keyword.t(), State.code()) :: :ok
+  defp write_table(:error, error, options, code) do
+    :ok = Message.writing_table(:error, code)
+    # :ok = Message.writing_table(:error, code)
+    :ok = Log.info(:writing_table, {:error, code, __ENV__})
+    :ok = Table.write(@state_spec, [error], options)
   end
 
   @spec write_table(:ok, [Station.observation()], Keyword.t(), State.code()) ::
@@ -127,6 +126,6 @@ defmodule NOAA.Observations.CLI do
   defp write_table(:ok, observations, options, code) do
     :ok = Message.writing_table(:ok, code)
     :ok = Log.info(:writing_table, {:ok, code, __ENV__})
-    :ok = Table.write(@table_spec, observations, options)
+    :ok = Table.write(@observations_spec, observations, options)
   end
 end

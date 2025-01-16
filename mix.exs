@@ -44,7 +44,8 @@ defmodule NOAA.Observations.Mixfile do
     [
       # Only using the `IO.ANSI.Table.write/3` function.
       included_applications: [:io_ansi_table],
-      extra_applications: [:logger, :eex, :observer, :wx, :runtime_tools]
+      extra_applications: [:eex, :logger, :observer, :runtime_tools, :wx],
+      mod: {NOAA.Observations.TopSup, :ok}
     ]
   end
 

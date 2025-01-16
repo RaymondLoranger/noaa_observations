@@ -4,10 +4,10 @@ defmodule NOAA.Observations.Message do
   alias NOAA.Observations.State
 
   @state_names get_env(:state_names)
-  @table_spec get_env(:table_spec)
-  @error_spec get_env(:error_spec)
-  @fault_spec get_env(:fault_spec)
-  @retry_spec get_env(:fault_spec)
+  @observations_spec get_env(:observations_spec)
+  @stations_spec get_env(:stations_spec)
+  @state_spec get_env(:state_spec)
+  @timeout_spec get_env(:timeout_spec)
 
   @spec status(pos_integer) :: String.t()
   def status(301), do: "Moved Permanently"
@@ -39,9 +39,10 @@ defmodule NOAA.Observations.Message do
   @spec writing_table(:ok | :error, State.code()) :: :ok
   def writing_table(:ok, code) do
     [
-      @table_spec.left_margin,
+      @observations_spec.left_margin,
       [:white, "Writing table of weather observations for "],
-      [:light_white, "#{@state_names[code] || "???"}..."]
+      [:light_white, "#{@state_names[code] || "???"}"],
+      [:white, "..."]
     ]
     |> IO.ANSI.format()
     |> IO.puts()
@@ -49,33 +50,22 @@ defmodule NOAA.Observations.Message do
 
   def writing_table(:error, code) do
     [
-      @error_spec.left_margin,
+      @stations_spec.left_margin,
       [:white, "Writing table of unresponsive stations for "],
-      [:light_white, "#{@state_names[code] || "???"}..."]
+      [:light_white, "#{@state_names[code] || "???"}"],
+      [:white, "..."]
     ]
     |> IO.ANSI.format()
     |> IO.puts()
   end
 
-  # @spec fetching_error(State.code(), Station.id(), String.t()) :: :ok
-  # def fetching_error(code, id, text) do
-  #   [
-  #     [:white, "Error fetching weather observations of "],
-  #     [:light_white, "#{@state_names[code] || "???"} "],
-  #     [:white, "for station "],
-  #     [:light_white, "#{id}..."],
-  #     [:light_yellow, :string.titlecase(text)]
-  #   ]
-  #   |> IO.ANSI.format()
-  #   |> IO.puts()
-  # end
-
   @spec fetching_error(State.code()) :: :ok
   def fetching_error(code) do
     [
-      @fault_spec.left_margin,
+      @state_spec.left_margin,
       [:white, "Error while fetching list of stations for "],
-      [:light_white, "#{@state_names[code] || "???"}..."]
+      [:light_white, "#{@state_names[code] || "???"}"],
+      [:white, "..."]
     ]
     |> IO.ANSI.format()
     |> IO.puts()
@@ -84,8 +74,8 @@ defmodule NOAA.Observations.Message do
   @spec timeout_error(State.code()) :: :ok
   def timeout_error(code) do
     [
-      @retry_spec.left_margin,
-      [:white, "Error while fetching observations for "],
+      @timeout_spec.left_margin,
+      [:white, "Timeout while fetching observations for "],
       [:light_white, "#{@state_names[code] || "???"}"],
       [:white, "... Trying again..."]
     ]

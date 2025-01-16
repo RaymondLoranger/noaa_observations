@@ -5,14 +5,12 @@ defmodule NOAA.Observations.State do
 
   use PersistConfig
 
-  alias NOAA.Observations.{Log, Message, Station, URL}
-
-  @templates get_env(:url_templates)
+  alias NOAA.Observations.{Log, Message, Station, TemplatesAgent}
 
   @typedoc "US state/territory code"
   @type code :: <<_::16>>
   @typedoc "Faulty state"
-  @type fault :: map
+  @type error :: map
 
   @doc """
   Fetches the stations for a `state_code`.
@@ -22,58 +20,63 @@ defmodule NOAA.Observations.State do
   ## Parameters
 
     - `state_code` - US state/territory code
-    - `template`   - URL template
 
   ## Examples
 
-      iex> alias NOAA.Observations.State
+      iex> alias NOAA.Observations.{State, TemplatesAgent}
+      iex> :ok = TemplatesAgent.refresh()
       iex> {:ok, stations} = State.stations("VT")
       iex> %{"KFSO" => name} = Map.new(stations)
       iex> name
       "Franklin County State Airport"
 
-      iex> alias NOAA.Observations.State
+      iex> alias NOAA.Observations.{State, TemplatesAgent}
       iex> template =
       ...>   "http://forecast.weather.gov/xml/current_obs" <>
       ...>     "/seek.php?state=<%=state_code%>&Find=Find"
-      iex> State.stations("VT", template)
+      iex> TemplatesAgent.update_state_template(template)
+      iex> State.stations("VT")
       {:error, 301, "Moved Permanently"}
 
-      iex> alias NOAA.Observations.State
+      iex> alias NOAA.Observations.{State, TemplatesAgent}
       iex> template =
       ...>   "https://www.weather.gov/xml/current_obs" <>
       ...>     "/seek.php?state=<%=state_code%>&Find=Find"
-      iex> State.stations("VT", template)
+      iex> TemplatesAgent.update_state_template(template)
+      iex> State.stations("VT")
       {:error, 302, "Found (Moved Temporarily)"}
 
-      iex> alias NOAA.Observations.State
+      iex> alias NOAA.Observations.{State, TemplatesAgent}
       iex> template =
       ...>   "https://forecast.weather.gov/xml/past_obs" <>
       ...>     "/seek.php?state=<%=state_code%>&Find=Find"
-      iex> State.stations("VT", template)
+      iex> TemplatesAgent.update_state_template(template)
+      iex> State.stations("VT")
       {:error, 404, "Not Found"}
 
-      iex> alias NOAA.Observations.State
+      iex> alias NOAA.Observations.{State, TemplatesAgent}
       iex> template =
       ...>   "htp://forecast.weather.gov/xml/current_obs" <>
       ...>     "/seek.php?state=<%=state_code%>&Find=Find"
-      iex> State.stations("VT", template)
+      iex> TemplatesAgent.update_state_template(template)
+      iex> State.stations("VT")
       {:error, :nxdomain, "Non-Existent Domain"}
 
-      iex> alias NOAA.Observations.State
+      iex> alias NOAA.Observations.{State, TemplatesAgent}
       iex> template = "http://localhost:65535"
-      iex> State.stations("VT", template)
+      iex> TemplatesAgent.update_state_template(template)
+      iex> State.stations("VT")
       {:error, :econnrefused, "Connection Refused By Server"}
 
-      iex> alias NOAA.Observations.State
+      iex> alias NOAA.Observations.{State, TemplatesAgent}
       iex> template = "http://localhost:65536"
-      iex> State.stations("VT", template)
+      iex> TemplatesAgent.update_state_template(template)
+      iex> State.stations("VT")
       {:error, :checkout_failure, "Checkout Failure"}
   """
-  @spec stations(code, URL.template()) ::
-          {:ok, [Station.t()]} | {:error, any, String.t()}
-  def stations(state_code, template \\ @templates.state) do
-    state_url = URL.for_state(state_code, template)
+  @spec stations(code) :: {:ok, [Station.t()]} | {:error, any, String.t()}
+  def stations(state_code) do
+    state_url = TemplatesAgent.state_url(state_code: state_code)
 
     case HTTPoison.get(state_url) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->

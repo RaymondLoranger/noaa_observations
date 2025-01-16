@@ -5,9 +5,7 @@ defmodule NOAA.Observations.Station do
 
   use PersistConfig
 
-  alias NOAA.Observations.{Log, Message, State, URL}
-
-  @templates get_env(:url_templates)
+  alias NOAA.Observations.{Log, Message, State, TemplatesAgent}
 
   @typedoc "Station ID"
   @type id :: <<_::32>>
@@ -29,42 +27,39 @@ defmodule NOAA.Observations.Station do
 
     - `{station_id, station_name}` - NOAA station
     - `state_code`                 - US state/territory code
-    - `template`                   - URL template
 
   ## Examples
 
-      iex> alias NOAA.Observations.Station
+      iex> alias NOAA.Observations.{Station, TemplatesAgent}
+      iex> :ok = TemplatesAgent.refresh()
       iex> {:ok, observation} =
       ...>   Station.observation({"KFSO", "KFSO name"}, "VT")
       iex> is_map(observation) and is_binary(observation["wind_mph"])
       true
 
-      iex> alias NOAA.Observations.Station
+      iex> alias NOAA.Observations.{Station, TemplatesAgent}
       iex> template =
       ...>   "htp://forecast.weather.gov/xml/current_obs" <>
       ...>     "/display.php?stid=<%=station_id%>"
+      iex> TemplatesAgent.update_station_template(template)
       iex> {:error, %{error_text: text, error_code: code, station_id: id}} =
-      ...>   Station.observation({"KFSO", "KFSO name"}, "VT", template)
+      ...>   Station.observation({"KFSO", "KFSO name"}, "VT")
       iex> {text, code, id}
       {"Non-Existent Domain", :nxdomain, "KFSO"}
 
-      iex> alias NOAA.Observations.Station
+      iex> alias NOAA.Observations.{Station, TemplatesAgent}
       iex> template =
       ...>   "https://forecast.weather.gov/xml/past_obs" <>
       ...>     "/display.php?stid=<%=station_id%>"
+      iex> TemplatesAgent.update_station_template(template)
       iex> {:error, %{error_text: text, error_code: code, station_id: id}} =
-      ...>   Station.observation({"KFSO", "KFSO name"}, "VT", template)
+      ...>   Station.observation({"KFSO", "KFSO name"}, "VT")
       iex> {text, code, id}
       {"Not Found", 404, "KFSO"}
   """
-  @spec observation(t, State.code(), URL.template()) ::
-          {:ok, observation} | {:error, error}
-  def observation(
-        {station_id, station_name} = _station,
-        state_code,
-        template \\ @templates.station
-      ) do
-    station_url = URL.for_station(station_id, template)
+  @spec observation(t, State.code()) :: {:ok, observation} | {:error, error}
+  def observation({station_id, station_name} = _station, state_code) do
+    station_url = TemplatesAgent.station_url(station_id: station_id)
 
     case HTTPoison.get(station_url) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->

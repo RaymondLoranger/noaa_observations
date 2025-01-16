@@ -7,14 +7,15 @@ defmodule NOAA.Observations do
   """
 
   use PersistConfig
+  use File.Only.Logger
 
   import Task, only: [async: 3, await: 2]
 
-  alias __MODULE__.{Message, State, Station, URL}
+  alias __MODULE__.{Log, Message, State, Station, TemplatesAgent}
   alias IO.ANSI.Table
 
-  @templates get_env(:url_templates)
-  @retry_spec get_env(:retry_spec)
+  @state_names get_env(:state_names)
+  @timeout_spec get_env(:timeout_spec)
 
   @doc """
   Fetches weather observations for a `state_code`.
@@ -22,20 +23,23 @@ defmodule NOAA.Observations do
   ## Parameters
 
     - `state_code` - US state/territory code
-    - `template`   - URL template
 
   ## Examples
 
       iex> alias NOAA.Observations
+      iex> alias NOAA.Observations.TemplatesAgent
+      iex> :ok = TemplatesAgent.refresh()
       iex> %{ok: observations} = Observations.fetch("VT")
       iex> Enum.all?(observations, &is_map/1) and length(observations) > 0
       true
 
       iex> alias NOAA.Observations
+      iex> alias NOAA.Observations.TemplatesAgent
       iex> template =
       ...>   "http://forecast.weather.gov/xml/current_obs" <>
       ...>     "/seek.php?state=<%=state_code%>&Find=Find"
-      iex> {:fault,
+      iex> TemplatesAgent.update_state_template(template)
+      iex> {:error,
       ...>  %{
       ...>    error_code: 301,
       ...>    error_text: "Moved Permanently",
@@ -45,10 +49,12 @@ defmodule NOAA.Observations do
       "http://forecast.weather.gov/xml/current_obs/seek.php?state=VT&Find=Find"
 
       iex> alias NOAA.Observations
+      iex> alias NOAA.Observations.TemplatesAgent
       iex> template =
       ...>   "https://www.weather.gov/xml/current_obs" <>
       ...>     "/seek.php?state=<%=state_code%>&Find=Find"
-      iex> {:fault,
+      iex> TemplatesAgent.update_state_template(template)
+      iex> {:error,
       ...>  %{
       ...>    error_code: 302,
       ...>    error_text: "Found (Moved Temporarily)",
@@ -58,20 +64,24 @@ defmodule NOAA.Observations do
       "https://www.weather.gov/xml/current_obs/seek.php?state=VT&Find=Find"
 
       iex> alias NOAA.Observations
+      iex> alias NOAA.Observations.TemplatesAgent
       iex> template =
       ...>   "https://forecast.weather.gov/xml/past_obs" <>
       ...>     "/seek.php?state=<%=state_code%>&Find=Find"
-      iex> {:fault,
+      iex> TemplatesAgent.update_state_template(template)
+      iex> {:error,
       ...>  %{error_code: 404, error_text: "Not Found", state_url: url}} =
       ...>   Observations.fetch("VT", template)
       iex> url
       "https://forecast.weather.gov/xml/past_obs/seek.php?state=VT&Find=Find"
 
       iex> alias NOAA.Observations
+      iex> alias NOAA.Observations.TemplatesAgent
       iex> template =
       ...>   "htp://forecast.weather.gov/xml/current_obs" <>
       ...>     "/seek.php?state=<%=state_code%>&Find=Find"
-      iex> {:fault,
+      iex> TemplatesAgent.update_state_template(template)
+      iex> {:error,
       ...>  %{
       ...>    error_code: :nxdomain,
       ...>    error_text: "Non-Existent Domain",
@@ -81,8 +91,10 @@ defmodule NOAA.Observations do
       "htp://forecast.weather.gov/xml/current_obs/seek.php?state=VT&Find=Find"
 
       iex> alias NOAA.Observations
+      iex> alias NOAA.Observations.TemplatesAgent
       iex> template = "http://localhost:65535"
-      iex> {:fault,
+      iex> TemplatesAgent.update_state_template(template)
+      iex> {:error,
       ...>  %{
       ...>    error_code: :econnrefused,
       ...>    error_text: "Connection Refused By Server",
@@ -91,42 +103,39 @@ defmodule NOAA.Observations do
       iex> url
       "http://localhost:65535"
   """
-  @spec fetch(State.code(), URL.template(), Keyword.t()) ::
+  @spec fetch(State.code(), Keyword.t()) ::
           %{
             optional(:ok) => [Station.observation()],
             optional(:error) => [Station.error()]
           }
-          | {:fault, State.fault()}
-  def fetch(state_code, template \\ @templates.state, options \\ []) do
-    # IO.inspect(state_code, label: "State Code")
-    # IO.inspect(template, label: "Template")
-    # IO.inspect(options, label: "Options")
-    state_url = URL.for_state(state_code, template)
+          | {:error, State.error()}
+  def fetch(state_code, options \\ []) do
+    state_url = TemplatesAgent.state_url(state_code: state_code)
 
-    case State.stations(state_code, template) do
+    case State.stations(state_code) do
       {:ok, stations} ->
         try do
           stations
           |> Enum.map(&async(Station, :observation, [&1, state_code]))
           |> Enum.map(&await(&1, 500))
-          # [{:ok, obs1}, {:ok, obs2}...{:error, error1}, {:error, error2}...] ->
-          # %{ok: [obs1, obs2...], error: [error1, error2...]}
+          # [{:ok, obs1}, {:ok, obs2}...{:error, err1}, {:error, err2}...] ->
+          # %{ok: [obs1, obs2...], error: [err1, err2...]}
           |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
         catch
           :exit, {:timeout, {Task, :await, [%Task{mfa: mfa}, timeout]}} ->
+            {mfa, function} = {inspect(mfa), fun(__ENV__)}
+            :ok = Log.error(:timeout, {mfa, timeout, state_code, __ENV__})
             Message.timeout_error(state_code)
-            map = %{error: :timeout, mfa: inspect(mfa), timeout: timeout}
-            Table.write(@retry_spec, [map], options)
-            # IO.puts("reason => #{inspect(reason)}")
-            # IO.puts("error => #{inspect(error)}")
-            # IO.puts("mfa => #{inspect(mfa)}")
-            # IO.puts("timeout ms => #{inspect(timeout)}")
-            fetch(state_code, template)
+            map = %{mfa: mfa, timeout: timeout, function: function}
+            Table.write(@timeout_spec, [map], options)
+            fetch(state_code, options)
         end
 
       {:error, error_code, error_text} ->
-        {:fault,
+        {:error,
          %{
+           state_code: state_code,
+           state_name: @state_names[state_code],
            error_code: error_code,
            error_text: error_text,
            state_url: state_url

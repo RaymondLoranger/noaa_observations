@@ -2,9 +2,13 @@ import Config
 
 alias IO.ANSI.Table.Spec
 
-headers = ~W[
-  weather temperature_string wind_mph wind_dir visibility_mi station_id location
-]
+# ┌─────────────────────────────────┐
+# │ ••• Observations table spec ••• │
+# └─────────────────────────────────┘
+
+headers =
+  ~W[weather temperature_string wind_mph wind_dir] ++
+    ~W[visibility_mi station_id location]
 
 options = [
   align_specs: [right: "wind_mph", right: "visibility_mi"],
@@ -19,7 +23,11 @@ options = [
 ]
 
 config :noaa_observations,
-  table_spec: Spec.new(headers, options) |> Spec.develop()
+  observations_spec: Spec.new(headers, options) |> Spec.develop()
+
+# ┌───────────────────────────────────┐
+# │ ••• Station errors table spec ••• │
+# └───────────────────────────────────┘
 
 headers = ~W[station_id station_name error_code error_text station_url]a
 
@@ -36,13 +44,18 @@ options = [
 ]
 
 config :noaa_observations,
-  error_spec: Spec.new(headers, options) |> Spec.develop()
+  stations_spec: Spec.new(headers, options) |> Spec.develop()
 
-headers = ~W[error_code error_text state_url]a
+# ┌────────────────────────────────┐
+# │ ••• State error table spec ••• │
+# └────────────────────────────────┘
+
+headers = ~W[state_code state_name error_code error_text state_url]a
 
 options = [
   # align_specs: [left: :station_id],
   header_fixes: %{
+    "State Code" => "St",
     "Error Code" => "Code",
     "Error Text" => "Error",
     "State Url" => "URL"
@@ -51,18 +64,22 @@ options = [
 ]
 
 config :noaa_observations,
-  fault_spec: Spec.new(headers, options) |> Spec.develop()
+  state_spec: Spec.new(headers, options) |> Spec.develop()
 
-headers = ~W[error timeout mfa]a
+# ┌────────────────────────────┐
+# │ ••• Timeout table spec ••• │
+# └────────────────────────────┘
+
+headers = ~W[mfa timeout function]a
 
 options = [
   align_specs: [right: :timeout],
   header_fixes: %{
-    "Mfa" => "MFA",
+    "Mfa" => "MFA {module, function, arity}",
     "Timeout" => "Timeout ms"
   },
   margins: [top: 0, bottom: 0, left: 1]
 ]
 
 config :noaa_observations,
-  retry_spec: Spec.new(headers, options) |> Spec.develop()
+  timeout_spec: Spec.new(headers, options) |> Spec.develop()

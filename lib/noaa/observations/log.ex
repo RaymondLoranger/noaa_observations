@@ -15,7 +15,7 @@ defmodule NOAA.Observations.Log do
 
   info :writing_table, {:error, code, env} do
     """
-    \nWriting table of erroneous stations for a state...
+    \nWriting table of unresponsive stations for a state...
     • State: #{code}
     • State name: #{@state_names[code] || "???"}
     #{from(env, __MODULE__)}\
@@ -68,6 +68,17 @@ defmodule NOAA.Observations.Log do
     • State name: #{@state_names[code] || "???"}
     • Error code: #{inspect(error_code)}
     • Error: #{maybe_break(error, 9)}
+    #{from(env, __MODULE__)}\
+    """
+  end
+
+  error :timeout, {mfa, timeout, state_code, env} do
+    """
+    \nTimeout while fetching observations for a state...
+    • State: #{state_code}
+    • State name: #{@state_names[state_code] || "???"}
+    • MFA: #{maybe_break(mfa, 7)}
+    • Timeout: #{timeout} ms
     #{from(env, __MODULE__)}\
     """
   end
