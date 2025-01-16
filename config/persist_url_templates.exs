@@ -1,6 +1,6 @@
 import Config
 
-scheme = "htp"
+scheme = "https"
 host = "forecast.weather.gov"
 state_path = "/xml/current_obs/seek.php"
 station_path = "/xml/current_obs/display.php"
