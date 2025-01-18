@@ -115,7 +115,7 @@ defmodule NOAA.Observations.CLI do
 
   @spec write_table(:error, State.error(), Keyword.t(), State.code()) :: :ok
   defp write_table(:error, error, options, code) do
-    :ok = Message.fetching_error(code)
+    :ok = Message.stations_not_fetched(code)
     # :ok = Message.writing_table(:error, code)
     :ok = Log.info(:writing_table, {:error, code, __ENV__})
     :ok = Table.write(@state_spec, [error], options)

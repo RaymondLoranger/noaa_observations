@@ -59,11 +59,11 @@ defmodule NOAA.Observations.Message do
     |> IO.puts()
   end
 
-  @spec fetching_error(State.code()) :: :ok
-  def fetching_error(code) do
+  @spec stations_not_fetched(State.code()) :: :ok
+  def stations_not_fetched(code) do
     [
       @state_spec.left_margin,
-      [:white, "Error while fetching list of stations for "],
+      [:white, "Failed to fetch the stations of "],
       [:light_white, "#{@state_names[code] || "???"}"],
       [:white, "..."]
     ]
@@ -71,12 +71,12 @@ defmodule NOAA.Observations.Message do
     |> IO.puts()
   end
 
-  @spec timeout_error(State.code()) :: :ok
-  def timeout_error(code) do
+  @spec timeout(State.code()) :: :ok
+  def timeout(state_code) do
     [
       @timeout_spec.left_margin,
       [:white, "Timeout while fetching observations for "],
-      [:light_white, "#{@state_names[code] || "???"}"],
+      [:light_white, "#{@state_names[state_code] || "???"}"],
       [:white, "... Trying again..."]
     ]
     |> IO.ANSI.format()

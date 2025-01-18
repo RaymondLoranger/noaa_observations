@@ -125,7 +125,7 @@ defmodule NOAA.Observations do
           :exit, {:timeout, {Task, :await, [%Task{mfa: mfa}, timeout]}} ->
             {mfa, function} = {inspect(mfa), fun(__ENV__)}
             :ok = Log.error(:timeout, {mfa, timeout, state_code, __ENV__})
-            Message.timeout_error(state_code)
+            Message.timeout(state_code)
             map = %{mfa: mfa, timeout: timeout, function: function}
             Table.write(@timeout_spec, [map], options)
             fetch(state_code, options)
