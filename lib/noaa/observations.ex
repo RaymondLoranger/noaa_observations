@@ -9,7 +9,7 @@ defmodule NOAA.Observations do
   use PersistConfig
   use File.Only.Logger
 
-  import Task, only: [async: 3, await: 2]
+  import Task, only: [async: 3, await: 1]
 
   alias __MODULE__.{Log, Message, State, Station, TemplatesAgent}
   alias IO.ANSI.Table
@@ -117,11 +117,12 @@ defmodule NOAA.Observations do
         try do
           stations
           |> Enum.map(&async(Station, :observation, [&1, state_code]))
-          |> Enum.map(&await(&1, 500))
+          |> Enum.map(&await/1)
           # [{:ok, obs1}, {:ok, obs2}...{:error, err1}, {:error, err2}...] ->
           # %{ok: [obs1, obs2...], error: [err1, err2...]}
           |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
         catch
+          # Default timeout is 5000 ms.
           :exit, {:timeout, {Task, :await, [%Task{mfa: mfa}, timeout]}} ->
             {mfa, function} = {inspect(mfa), fun(__ENV__)}
             :ok = Log.error(:timeout, {mfa, timeout, state_code, __ENV__})

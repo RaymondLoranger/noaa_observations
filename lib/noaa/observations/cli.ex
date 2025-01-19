@@ -73,7 +73,7 @@ defmodule NOAA.Observations.CLI do
          {count, ""} when count > 0 <- Integer.parse(count),
          count = if(last?, do: -count, else: count),
          options = [count: count, bell: bell?, style: style] do
-      :ok = write_table(state_code, options)
+      :ok = String.upcase(state_code) |> write_table(options)
     else
       _error -> :ok = Help.show_help()
     end
@@ -116,8 +116,6 @@ defmodule NOAA.Observations.CLI do
   @spec write_table(:error, State.error(), Keyword.t(), State.code()) :: :ok
   defp write_table(:error, error, options, code) do
     :ok = Message.stations_not_fetched(code)
-    # :ok = Message.writing_table(:error, code)
-    # :ok = Log.info(:writing_table, {:error, code, __ENV__})
     :ok = Table.write(@state_spec, [error], options)
   end
 

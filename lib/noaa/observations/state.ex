@@ -9,7 +9,7 @@ defmodule NOAA.Observations.State do
 
   @typedoc "US state/territory code"
   @type code :: <<_::16>>
-  @typedoc "Faulty state"
+  @typedoc "Erroneous state"
   @type error :: map
 
   @doc """
