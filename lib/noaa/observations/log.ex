@@ -72,13 +72,21 @@ defmodule NOAA.Observations.Log do
     """
   end
 
-  error :timeout, {mfa, timeout, state_code, env} do
+  error :timeout, {mfa, timeout, state_code, retries, env} do
     """
     \nTimeout while fetching observations for a state...
     • State: #{state_code}
     • State name: #{@state_names[state_code] || "???"}
     • MFA: #{maybe_break(mfa, 7)}
     • Timeout: #{timeout} ms
+    • Retries left: #{retries}
+    #{from(env, __MODULE__)}\
+    """
+  end
+
+  info :halting, {env} do
+    """
+    \nHalting the Erlang runtime system...
     #{from(env, __MODULE__)}\
     """
   end

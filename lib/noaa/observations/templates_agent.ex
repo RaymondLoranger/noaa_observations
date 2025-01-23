@@ -1,6 +1,6 @@
 defmodule NOAA.Observations.TemplatesAgent do
   @moduledoc """
-  An agent process loading state and station URL templates from a config file.
+  An agent process loading the state and station URL templates.
   """
 
   use Agent
@@ -16,7 +16,7 @@ defmodule NOAA.Observations.TemplatesAgent do
   @templates get_env(:url_templates)
 
   @doc """
-  Spawns an agent process that loads URL templates from a config file.
+  Spawns an agent process that loads the state and station URL templates.
 
   ## Examples
 
@@ -105,14 +105,14 @@ defmodule NOAA.Observations.TemplatesAgent do
   end
 
   @doc """
-  Refreshes the agent state from a config file.
+  Refreshes the agent state.
   """
   @spec refresh :: :ok
-  def refresh, do: Agent.update(TemplatesAgent, fn _state -> @templates end)
+  def refresh, do: Agent.update(TemplatesAgent, fn _templates -> @templates end)
 
   ## Private functions
 
-  # Returns a map of state and station URL templates
+  # Returns a map of state and station URL templates.
   @spec templates :: %{state: template, station: template}
   defp templates, do: @templates
 end
