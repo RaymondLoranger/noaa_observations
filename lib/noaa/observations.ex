@@ -131,14 +131,14 @@ defmodule NOAA.Observations do
 
             :ok = Message.timeout(state_code, retries)
             map = %{mfa: mfa, timeout: timeout, function: function}
-            Table.write(@timeout_spec, [map], options)
+            :ok = Table.write(@timeout_spec, [map], options)
 
             if retries > 0 do
               fetch(state_code, options)
             else
               :ok = Log.info(:halting, {__ENV__})
               # Ensure messages logged before exiting...
-              Process.sleep(@wait)
+              :ok = Process.sleep(@wait)
               System.halt()
             end
         end

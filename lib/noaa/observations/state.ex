@@ -69,10 +69,10 @@ defmodule NOAA.Observations.State do
       {:error, :econnrefused, "Connection Refused By Server"}
 
       iex> alias NOAA.Observations.{State, TemplatesAgent}
-      iex> template = "http://localhost:65536"
+      iex> template = "http://localhost:0"
       iex> TemplatesAgent.update_state_template(template)
       iex> State.stations("VT")
-      {:error, :checkout_failure, "Checkout Failure"}
+      {:error, :eaddrnotavail, "Address Not Available"}
   """
   @spec stations(code) :: {:ok, [Station.t()]} | {:error, any, String.t()}
   def stations(state_code) do

@@ -30,6 +30,7 @@ defmodule NOAA.Observations.Message do
   @spec error(term) :: String.t()
   def error(:nxdomain), do: "Non-Existent Domain"
   def error(:econnrefused), do: "Connection Refused By Server"
+  def error(:eaddrnotavail), do: "Address Not Available"
   def error(:checkout_failure), do: "Checkout Failure"
   def error(:servfail), do: "Server Failure"
   def error(:refused), do: "Query Refused"
