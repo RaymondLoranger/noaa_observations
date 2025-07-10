@@ -6,5 +6,5 @@ config :noaa_observations,
     normal: :reset,
     section: :light_green,
     switch: :light_yellow,
-    value: :light_magenta
+    value: :light_blue
   }
