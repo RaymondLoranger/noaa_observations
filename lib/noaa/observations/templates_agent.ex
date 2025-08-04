@@ -12,6 +12,8 @@ defmodule NOAA.Observations.TemplatesAgent do
   @type url :: String.t()
   @typedoc "URL template"
   @type template :: String.t()
+  @typedoc "A map of state and station URL templates"
+  @type templates :: %{state: template, station: template}
 
   @templates get_env(:url_templates)
 
@@ -85,7 +87,7 @@ defmodule NOAA.Observations.TemplatesAgent do
   """
   @spec update_state_template(template) :: :ok
   def update_state_template(template) when is_binary(template) do
-    Agent.update(TemplatesAgent, &Map.replace(&1, :state, template))
+    Agent.update(TemplatesAgent, &%{&1 | state: template})
   end
 
   @doc """
@@ -101,18 +103,19 @@ defmodule NOAA.Observations.TemplatesAgent do
   """
   @spec update_station_template(template) :: :ok
   def update_station_template(template) when is_binary(template) do
-    Agent.update(TemplatesAgent, &Map.replace(&1, :station, template))
+    Agent.update(TemplatesAgent, &%{&1 | station: template})
   end
 
   @doc """
   Refreshes the agent state.
   """
   @spec refresh :: :ok
-  def refresh, do: Agent.update(TemplatesAgent, fn _templates -> @templates end)
+  # def refresh, do: Agent.update(TemplatesAgent, fn _templates -> @templates end)
+  def refresh, do: Agent.update(TemplatesAgent, &templates/1)
 
   ## Private functions
 
   # Returns a map of state and station URL templates.
-  @spec templates :: %{state: template, station: template}
-  defp templates, do: @templates
+  @spec templates(templates | nil) :: templates
+  defp templates(_agent_state \\ nil), do: @templates
 end

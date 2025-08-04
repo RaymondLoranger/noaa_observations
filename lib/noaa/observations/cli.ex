@@ -156,5 +156,5 @@ defmodule NOAA.Observations.CLI do
   end
 
   @spec hike_count(keyword) :: keyword
-  defp hike_count(options), do: Keyword.put(options, :count, 999)
+  defp hike_count(options), do: put_in(options[:count], 999)
 end

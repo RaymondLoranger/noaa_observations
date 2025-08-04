@@ -113,14 +113,17 @@ defmodule NOAA.Observations do
 
     case State.stations(state_code) do
       {:ok, stations} ->
+        await_timeout = await_timeout()
+
         try do
           stations
           |> Enum.map(&Task.async(Station, :observation, [&1, state_code]))
           # Default timeout is 5000 ms...
-          |> Enum.map(&Task.await/1)
+          # |> Enum.map(&Task.await/1)
+          |> Enum.map(&Task.await(&1, await_timeout))
           # [{:ok, obs1}, {:ok, obs2}...{:error, err1}, {:error, err2}...] ->
           # %{ok: [obs1, obs2...], error: [err1, err2...]}
-          |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
+          |> Enum.group_by(fn {k, _v} -> k end, fn {_k, v} -> v end)
         catch
           :exit, {:timeout, {Task, :await, [%Task{mfa: mfa}, timeout]}} ->
             {mfa, function} = {inspect(mfa), fun(__ENV__)}
@@ -154,4 +157,7 @@ defmodule NOAA.Observations do
          }}
     end
   end
+
+  @spec await_timeout :: non_neg_integer
+  def await_timeout, do: get_env(:await_timeout)
 end
