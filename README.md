@@ -24,10 +24,8 @@ no ny 9 -blt dark
 no ny 9 --last --table-style=dark
 ```
 
+## Note
+You can click on the image below for a clearer view.
+
 ## Examples
-## ![pretty](images/pretty.png)
-## ![pretty_alt](images/pretty_alt.png)
-## ![pretty_mult](images/pretty_mult.png)
-## ![dotted](images/dotted.png)
-## ![dotted_alt](images/dotted_alt.png)
-## ![dotted_mult](images/dotted_mult.png)
+## ![examples](images/examples.png)
