@@ -14,9 +14,10 @@ defmodule NOAA.Observations.Mixfile do
       # aliases: aliases(),
       escript: escript(),
       deps: deps(),
-      # See NOAA.Observations.CLI.main/1...
-      # See NOAA.Observations.url/2...
-      dialyzer: [plt_add_apps: [:io_ansi_table, :eex]]
+      # See NOAA.Observations.TemplatesAgent.state_url/1...
+      # See NOAA.Observations.TemplatesAgent.station_url/1...
+      # See NOAA.Observations.CLI.write_table/4...
+      dialyzer: [plt_add_apps: [:eex, :io_ansi_table]]
     ]
   end
 
@@ -44,7 +45,7 @@ defmodule NOAA.Observations.Mixfile do
     [
       # Only using the `IO.ANSI.Table.write/3` function.
       included_applications: [:io_ansi_table],
-      extra_applications: [:eex, :logger, :observer, :runtime_tools, :wx],
+      extra_applications: [:eex, :logger],
       mod: {NOAA.Observations.TopSup, :ok}
     ]
   end
@@ -57,6 +58,7 @@ defmodule NOAA.Observations.Mixfile do
       {:file_only_logger, "~> 0.2"},
       # {:file_only_logger, path: "../file_only_logger"},
       {:httpoison, "~> 2.0"},
+      {:io_ansi_plus, "~> 0.1"},
       {:io_ansi_table, "~> 1.0"},
       # {:io_ansi_table, path: "../io_ansi_table"},
       {:log_reset, "~> 0.1"},
@@ -65,22 +67,16 @@ defmodule NOAA.Observations.Mixfile do
     ]
   end
 
+  # @cmd "xcopy images doc\\images /Y"
+
   # defp aliases do
   #   [
-  #     docs: ["docs", &copy_images/1]
+  #     docs: ["docs", &echo_xcopy/1, "cmd #{@cmd}"]
   #   ]
   # end
 
-  # defp copy_images(_) do
-  #   File.cp_r("images", "doc/images", fn src, dst ->
-  #     # Always true...
-  #     src || dst
-
-  #     # IO.gets(~s|Overwriting "#{dst}" with "#{src}".\nProceed? [Yn]\s|) in [
-  #     #   "y\n",
-  #     #   "Y\n"
-  #     # ]
-  #   end)
+  # defp echo_xcopy(_) do
+  #   IO.ANSI.Plus.puts([:light_yellow, @cmd])
   # end
 
   defp escript do

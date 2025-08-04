@@ -4,7 +4,7 @@ config :noaa_observations, default_count: "22"
 
 config :noaa_observations,
   default_switches: %{
-    help: nil,
+    help: false,
     bell: false,
     last: false,
     table_style: "dark"

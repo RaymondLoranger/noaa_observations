@@ -2,9 +2,9 @@ import Config
 
 config :noaa_observations,
   help_attrs: %{
-    arg: :light_cyan,
+    arg: :baby_blue,
     normal: :reset,
-    section: :light_green,
-    switch: :light_yellow,
-    value: :light_blue
+    section: :cotton_candy,
+    switch: :chartreuse_yellow,
+    value: :screamin_green
   }

@@ -6,9 +6,9 @@ alias IO.ANSI.Table.Spec
 # │ ••• Observations table spec ••• │
 # └─────────────────────────────────┘
 
-headers =
-  ~W[weather temperature_string wind_mph wind_dir] ++
-    ~W[visibility_mi station_id location]
+headers = ~W[
+  weather temperature_string wind_mph wind_dir visibility_mi station_id location
+]
 
 options = [
   align_specs: [right: "wind_mph", right: "visibility_mi"],
