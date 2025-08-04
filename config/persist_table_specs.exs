@@ -10,6 +10,13 @@ headers = ~W[
   weather temperature_string wind_mph wind_dir visibility_mi station_id location
 ]
 
+headers =
+  case Mix.env() do
+    :dev -> headers
+    :prod -> headers -- ~W[station_id]
+    :test -> headers -- ~W[visibility_mi]
+  end
+
 options = [
   align_specs: [right: "wind_mph", right: "visibility_mi"],
   header_fixes: %{

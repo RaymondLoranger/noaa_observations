@@ -1,12 +1,13 @@
 defmodule NOAA.Observations.Message do
   use PersistConfig
 
+  alias IO.ANSI.Plus, as: ANSI
   alias NOAA.Observations.State
 
-  @state_names get_env(:state_names)
   @observations_spec get_env(:observations_spec)
-  @stations_spec get_env(:stations_spec)
+  @state_names get_env(:state_names)
   @state_spec get_env(:state_spec)
+  @stations_spec get_env(:stations_spec)
   @timeout_spec get_env(:timeout_spec)
 
   @spec status(pos_integer) :: String.t()
@@ -45,8 +46,7 @@ defmodule NOAA.Observations.Message do
       [:light_white, "#{@state_names[code] || "???"}"],
       [:white, "..."]
     ]
-    |> IO.ANSI.format()
-    |> IO.puts()
+    |> ANSI.puts()
   end
 
   def writing_table(:error, code) do
@@ -56,8 +56,7 @@ defmodule NOAA.Observations.Message do
       [:light_white, "#{@state_names[code] || "???"}"],
       [:white, "..."]
     ]
-    |> IO.ANSI.format()
-    |> IO.puts()
+    |> ANSI.puts()
   end
 
   @spec stations_not_fetched(State.code()) :: :ok
@@ -68,8 +67,7 @@ defmodule NOAA.Observations.Message do
       [:light_white, "#{@state_names[code] || "???"}"],
       [:white, "..."]
     ]
-    |> IO.ANSI.format()
-    |> IO.puts()
+    |> ANSI.puts()
   end
 
   @spec timeout(State.code(), non_neg_integer) :: :ok
@@ -80,7 +78,6 @@ defmodule NOAA.Observations.Message do
       [:light_white, "#{@state_names[state_code] || "???"}"],
       [:white, "...#{if retries > 0, do: " Trying again...", else: ""}"]
     ]
-    |> IO.ANSI.format()
-    |> IO.puts()
+    |> ANSI.puts()
   end
 end

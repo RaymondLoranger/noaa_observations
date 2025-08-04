@@ -70,6 +70,23 @@ defmodule NOAA.Observations.CLI do
     end
   end
 
+  @doc """
+  Allows to run command `mix run -e 'NOAA.Observations.CLI.main()'`.
+
+  The above command is equivalent to:\s\s
+  `mix run -e 'NOAA.Observations.CLI.main([""ny"", ""16"", ""-t"", ""plain""])'`
+
+  ## Examples
+
+      $env:MIX_ENV="test"; mix run -e 'NOAA.Observations.CLI.main()'
+      $env:MIX_ENV="dev"; mix run -e 'NOAA.Observations.CLI.main()'
+      $env:MIX_ENV="prod"; mix run -e 'NOAA.Observations.CLI.main()'
+  """
+  @spec main :: :ok
+  def main do
+    :ok = main(["ny", "16", "-t", "plain"])
+  end
+
   ## Private functions
 
   @spec maybe_write_table(Keyword.t(), OptionParser.argv()) :: :ok
@@ -78,10 +95,11 @@ defmodule NOAA.Observations.CLI do
   end
 
   defp maybe_write_table(switches, [state_code, count]) do
-    with %{help: nil, bell: bell?, last: last?, table_style: style} <-
+    with %{help: false, bell: bell?, last: last?, table_style: style} <-
            Map.merge(@default_switches, Map.new(switches)),
          {:ok, style} <- Style.from_switch_arg(style),
          {count, ""} when count > 0 <- Integer.parse(count),
+         count = if(last?, do: -count, else: count),
          options = [count: count, bell: bell?, style: style] do
       :ok = String.upcase(state_code) |> write_table(options)
     else
@@ -98,17 +116,17 @@ defmodule NOAA.Observations.CLI do
   defp write_table(state_code, options) do
     case Observations.fetch(state_code, options) do
       %{error: errors, ok: observations} ->
-        :ok = write_table(:error, errors, options, state_code)
+        :ok = write_table(:error, errors, hike_count(options), state_code)
         :ok = write_table(:ok, observations, options, state_code)
 
       %{ok: observations} ->
         :ok = write_table(:ok, observations, options, state_code)
 
       %{error: errors} when is_list(errors) ->
-        :ok = write_table(:error, errors, options, state_code)
+        :ok = write_table(:error, errors, hike_count(options), state_code)
 
       {:error, error} ->
-        :ok = write_table(:error, error, options, state_code)
+        :ok = write_table(:error, error, hike_count(options), state_code)
 
       _empty_map ->
         :ok = write_table(:ok, [], options, state_code)
@@ -136,4 +154,7 @@ defmodule NOAA.Observations.CLI do
     :ok = Log.info(:writing_table, {:ok, code, __ENV__})
     :ok = Table.write(@observations_spec, observations, options)
   end
+
+  @spec hike_count(keyword) :: keyword
+  defp hike_count(options), do: Keyword.put(options, :count, 999)
 end
