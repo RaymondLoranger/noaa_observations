@@ -82,26 +82,14 @@ defmodule NOAA.Observations.Station do
 
       {:ok, %HTTPoison.Response{status_code: status_code}} ->
         error_text = Message.status(status_code)
-
-        :ok =
-          Log.error(
-            :observation_not_fetched,
-            {station_id, station_name, state_code, status_code, error_text,
-             station_url, __ENV__}
-          )
-
-        {:error,
-         %{
-           station_id: station_id,
-           station_name: station_name,
-           error_code: status_code,
-           error_text: error_text,
-           station_url: station_url
-         }}
+        tuple = {station_id, station_name, state_code, error_text, station_url}
+        :ok = Log.error(:observation_not_fetched, Tuple.append(tuple, __ENV__))
+        {:error, error(tuple)}
 
       {:error, %HTTPoison.Error{reason: reason}} ->
         error_text = Message.error(reason)
-
+        tuple = {station_id, station_name, state_code, reason, error_text,
+             station_url
         :ok =
           Log.error(
             :observation_not_fetched,
@@ -118,5 +106,16 @@ defmodule NOAA.Observations.Station do
            station_url: station_url
          }}
     end
+  end
+
+  @spec error(tuple) :: error
+  defp error({id, name, code, status_or_reason, text, url, _env}) do
+    %{
+      station_id: id,
+      station_name: name,
+      error_code: status_or_reason,
+      error_text: text,
+      station_url: url
+    }
   end
 end
