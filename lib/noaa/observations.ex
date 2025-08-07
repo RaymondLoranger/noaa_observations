@@ -9,12 +9,13 @@ defmodule NOAA.Observations do
   use PersistConfig
   use File.Only.Logger
 
-  alias __MODULE__.{Log, Message, RetriesAgent, State, Station, TemplatesAgent}
+  alias __MODULE__.{Log, Message, State, Station, TemplatesAgent}
   alias IO.ANSI.Table
 
+  @fetches_left get_env(:fetches_left)
   @state_names get_env(:state_names)
   @timeout_spec get_env(:timeout_spec)
-  @wait 300
+  @wait 400
 
   @typedoc "A map of station observations/errors"
   @type t :: %{
@@ -112,10 +113,10 @@ defmodule NOAA.Observations do
   def fetch(state_code, options \\ []) do
     case State.stations(state_code) do
       {:ok, stations} ->
-        await_timeout() |> _fetch(stations, state_code, options)
+        _fetch(stations, state_code, options, @fetches_left)
 
       {:error, error_code, error_text} ->
-        {:error, error({state_code, error_code, error_text})}
+        {:error, _error(state_code, error_code, error_text)}
     end
   end
 
@@ -124,8 +125,8 @@ defmodule NOAA.Observations do
   @spec await_timeout :: non_neg_integer
   defp await_timeout, do: get_env(:await_timeout)
 
-  @spec error({State.code(), any, String.t()}) :: State.error()
-  defp error({state_code, error_code, error_text}) do
+  @spec _error(State.code(), any, String.t()) :: State.error()
+  defp _error(state_code, error_code, error_text) do
     %{
       state_code: state_code,
       state_name: @state_names[state_code],
@@ -135,32 +136,32 @@ defmodule NOAA.Observations do
     }
   end
 
-  # TODO: get rid of retries agent...
-  defp _fetch(await_timeout, stations, state_code, options) do
+  @spec _fetch([Station.t()], State.code(), keyword, non_neg_integer) ::
+          t | no_return
+  defp _fetch(_stations, _state_code, _options, _fetches_left = 0) do
+    :ok = Log.info(:halting, __ENV__)
+    # Ensure message logged before halting...
+    :ok = Process.sleep(@wait)
+    System.halt()
+  end
+
+  defp _fetch(stations, state_code, options, fetches_left) do
     try do
       stations
       |> Enum.map(&Task.async(Station, :observation, [&1, state_code]))
-      |> Enum.map(&Task.await(&1, await_timeout))
+      |> Enum.map(&Task.await(&1, await_timeout()))
       # [{:ok, obs1}, {:ok, obs2}...{:error, err1}, {:error, err2}...] ->
       # %{ok: [obs1, obs2...], error: [err1, err2...]}
       |> Enum.group_by(fn {k, _v} -> k end, fn {_k, v} -> v end)
     catch
       :exit, {:timeout, {Task, :await, [%Task{mfa: mfa}, timeout]}} ->
+        left = fetches_left - 1
         {mfa, function} = {inspect(mfa), fun(__ENV__)}
-        retries = RetriesAgent.get_and_decrement()
-        :ok = Log.error(:timeout, {mfa, timeout, state_code, retries, __ENV__})
-        :ok = Message.timeout(state_code, retries)
+        :ok = Log.error(:timeout, {mfa, timeout, state_code, left, __ENV__})
+        :ok = Message.timeout(state_code, left)
         map = %{mfa: mfa, timeout: timeout, function: function}
         :ok = Table.write(@timeout_spec, [map], options)
-
-        if retries > 0 do
-          _fetch(await_timeout, stations, state_code, options)
-        else
-          :ok = Log.info(:halting, __ENV__)
-          # Ensure messages logged before halting...
-          :ok = Process.sleep(@wait)
-          System.halt()
-        end
+        _fetch(stations, state_code, options, left)
     end
   end
 end

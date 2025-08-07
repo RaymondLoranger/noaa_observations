@@ -69,13 +69,13 @@ defmodule NOAA.Observations.Station do
         error_text = Message.status(status_code)
         args = {args, {status_code, error_text}}
         :ok = Log.error(:observation_not_fetched, args)
-        {:error, error(args)}
+        {:error, _error(args)}
 
       {:error, %HTTPoison.Error{reason: reason}} ->
         error_text = Message.error(reason)
         args = {args, {reason, error_text}}
         :ok = Log.error(:observation_not_fetched, args)
-        {:error, error(args)}
+        {:error, _error(args)}
     end
   end
 
@@ -92,8 +92,8 @@ defmodule NOAA.Observations.Station do
     |> Map.new(&List.to_tuple/1)
   end
 
-  @spec error(tuple) :: error
-  defp error(
+  @spec _error(tuple) :: error
+  defp _error(
          {{station_id, station_name, station_url, _state_code, _env},
           {error_code, error_text}}
        ) do

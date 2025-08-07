@@ -1,5 +1,5 @@
 defmodule NOAA.Observations.CLITest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   alias NOAA.Observations.CLI
 

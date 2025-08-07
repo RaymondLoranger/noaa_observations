@@ -71,12 +71,12 @@ defmodule NOAA.Observations.Message do
   end
 
   @spec timeout(State.code(), non_neg_integer) :: :ok
-  def timeout(state_code, retries) do
+  def timeout(state_code, left) do
     [
       @timeout_spec.left_margin,
       [:white, "Timeout while fetching observations for "],
       [:light_white, "#{@state_names[state_code] || "???"}"],
-      [:white, "...#{if retries > 0, do: " Trying again...", else: ""}"]
+      [:white, "... #{(left > 0 && "Trying again...") || "Halting..."}"]
     ]
     |> ANSI.puts()
   end

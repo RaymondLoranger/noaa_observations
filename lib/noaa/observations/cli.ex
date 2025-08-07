@@ -81,6 +81,7 @@ defmodule NOAA.Observations.CLI do
       $env:MIX_ENV="test"; mix run -e 'NOAA.Observations.CLI.main()'
       $env:MIX_ENV="dev"; mix run -e 'NOAA.Observations.CLI.main()'
       $env:MIX_ENV="prod"; mix run -e 'NOAA.Observations.CLI.main()'
+      $env:AWAIT_TIMEOUT="111"; mix run -e 'NOAA.Observations.CLI.main()'
   """
   @spec main :: :ok
   def main do
@@ -135,23 +136,23 @@ defmodule NOAA.Observations.CLI do
 
   @dialyzer {:nowarn_function, [write_table: 4]}
   @spec write_table(:error, [Station.error()], Keyword.t(), State.code()) :: :ok
-  defp write_table(:error, errors, options, code) when is_list(errors) do
-    :ok = Message.writing_table(:error, code)
-    :ok = Log.info(:writing_table, {:error, code, __ENV__})
+  defp write_table(:error, errors, options, state_code) when is_list(errors) do
+    :ok = Message.writing_table(:error, state_code)
+    :ok = Log.info(:writing_table, {:error, state_code, __ENV__})
     :ok = Table.write(@stations_spec, errors, options)
   end
 
   @spec write_table(:error, State.error(), Keyword.t(), State.code()) :: :ok
-  defp write_table(:error, error, options, code) do
-    :ok = Message.stations_not_fetched(code)
+  defp write_table(:error, error, options, state_code) do
+    :ok = Message.stations_not_fetched(state_code)
     :ok = Table.write(@state_spec, [error], options)
   end
 
   @spec write_table(:ok, [Station.observation()], Keyword.t(), State.code()) ::
           :ok
-  defp write_table(:ok, observations, options, code) do
-    :ok = Message.writing_table(:ok, code)
-    :ok = Log.info(:writing_table, {:ok, code, __ENV__})
+  defp write_table(:ok, observations, options, state_code) do
+    :ok = Message.writing_table(:ok, state_code)
+    :ok = Log.info(:writing_table, {:ok, state_code, __ENV__})
     :ok = Table.write(@observations_spec, observations, options)
   end
 

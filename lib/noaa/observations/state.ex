@@ -102,7 +102,7 @@ defmodule NOAA.Observations.State do
   defp _stations(body) do
     # <a href="/xml/current_obs/display.php?stid=KTIX">Titusville</a>
     # capture station ID and name
-    ~r[<a href=".*?stid=(.*?)">(.*?)</a>]
+    ~r[<a href=".*?stid=(\w+)">(.*?)</a>]
     # i.e. only captured subpatterns
     |> Regex.scan(body, capture: :all_but_first)
     # each [id, name] -> {id, name}

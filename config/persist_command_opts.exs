@@ -7,7 +7,7 @@ config :noaa_observations,
     help: false,
     bell: false,
     last: false,
-    table_style: "dark"
+    table_style: "light"
   }
 
 config :noaa_observations,
