@@ -3,8 +3,6 @@ defmodule NOAA.Observations.Station do
   Fetches the latest observation for a given NOAA station.
   """
 
-  use PersistConfig
-
   alias NOAA.Observations.{Log, Message, State, TemplatesAgent}
 
   @typedoc "Station ID"
@@ -60,62 +58,51 @@ defmodule NOAA.Observations.Station do
   @spec observation(t, State.code()) :: {:ok, observation} | {:error, error}
   def observation({station_id, station_name} = _station, state_code) do
     station_url = TemplatesAgent.station_url(station_id: station_id)
+    args = {station_id, station_name, station_url, state_code, __ENV__}
 
     case HTTPoison.get(station_url) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        :ok =
-          Log.info(
-            :observation_fetched,
-            {station_id, station_name, state_code, station_url, __ENV__}
-          )
-
-        {
-          :ok,
-          # <weather>Fog</weather> or <weather> Rain</weather>
-          # capture XML tag and value
-          ~r{<([^/][^>]+)>\s*(.*?)</\1>}
-          # i.e. only subpatterns
-          |> Regex.scan(body, capture: :all_but_first)
-          # each [tag, value] -> {tag, value}
-          |> Map.new(&List.to_tuple/1)
-        }
+        :ok = Log.info(:observation_fetched, args)
+        {:ok, _observation(body)}
 
       {:ok, %HTTPoison.Response{status_code: status_code}} ->
         error_text = Message.status(status_code)
-        tuple = {station_id, station_name, state_code, error_text, station_url}
-        :ok = Log.error(:observation_not_fetched, Tuple.append(tuple, __ENV__))
-        {:error, error(tuple)}
+        args = {args, {status_code, error_text}}
+        :ok = Log.error(:observation_not_fetched, args)
+        {:error, error(args)}
 
       {:error, %HTTPoison.Error{reason: reason}} ->
         error_text = Message.error(reason)
-        tuple = {station_id, station_name, state_code, reason, error_text,
-             station_url
-        :ok =
-          Log.error(
-            :observation_not_fetched,
-            {station_id, station_name, state_code, reason, error_text,
-             station_url, __ENV__}
-          )
-
-        {:error,
-         %{
-           station_id: station_id,
-           station_name: station_name,
-           error_code: reason,
-           error_text: error_text,
-           station_url: station_url
-         }}
+        args = {args, {reason, error_text}}
+        :ok = Log.error(:observation_not_fetched, args)
+        {:error, error(args)}
     end
   end
 
+  ## Private functions
+
+  @spec _observation(String.t()) :: observation
+  defp _observation(body) do
+    # <weather>Fog</weather> or <weather> Rain</weather>
+    # capture XML tag and value
+    ~r{<(\w+)>\s*(.*?)</\1>}
+    # i.e. only captured subpatterns
+    |> Regex.scan(body, capture: :all_but_first)
+    # each [tag, value] -> {tag, value}
+    |> Map.new(&List.to_tuple/1)
+  end
+
   @spec error(tuple) :: error
-  defp error({id, name, code, status_or_reason, text, url, _env}) do
+  defp error(
+         {{station_id, station_name, station_url, _state_code, _env},
+          {error_code, error_text}}
+       ) do
     %{
-      station_id: id,
-      station_name: name,
-      error_code: status_or_reason,
-      error_text: text,
-      station_url: url
+      station_id: station_id,
+      station_name: station_name,
+      station_url: station_url,
+      error_code: error_code,
+      error_text: error_text
     }
   end
 end

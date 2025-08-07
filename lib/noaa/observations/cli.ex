@@ -115,7 +115,7 @@ defmodule NOAA.Observations.CLI do
   @spec write_table(State.code(), Keyword.t()) :: :ok
   defp write_table(state_code, options) do
     case Observations.fetch(state_code, options) do
-      %{error: errors, ok: observations} ->
+      %{ok: observations, error: errors} ->
         :ok = write_table(:error, errors, hike_count(options), state_code)
         :ok = write_table(:ok, observations, options, state_code)
 
@@ -126,9 +126,9 @@ defmodule NOAA.Observations.CLI do
         :ok = write_table(:error, errors, hike_count(options), state_code)
 
       {:error, error} ->
-        :ok = write_table(:error, error, hike_count(options), state_code)
+        :ok = write_table(:error, error, options, state_code)
 
-      _empty_map ->
+      _empty_map_on_invalid_state_code ->
         :ok = write_table(:ok, [], options, state_code)
     end
   end

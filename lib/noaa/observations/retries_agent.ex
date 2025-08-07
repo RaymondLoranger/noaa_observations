@@ -46,11 +46,11 @@ defmodule NOAA.Observations.RetriesAgent do
   Refreshes the agent state.
   """
   @spec refresh :: :ok
-  def refresh, do: Agent.update(RetriesAgent, fn _retries -> @retries end)
+  def refresh, do: Agent.update(RetriesAgent, &retries/1)
 
   ## Private functions
 
   # Returns the maximum number of timeout retries.
-  @spec retries :: pos_integer
-  defp retries, do: @retries
+  @spec retries(non_neg_integer | nil) :: pos_integer
+  defp retries(_retries \\ nil), do: @retries
 end

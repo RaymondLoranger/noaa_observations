@@ -4,20 +4,20 @@ defmodule NOAA.Observations.Log do
 
   @state_names get_env(:state_names)
 
-  info :writing_table, {:ok, code, env} do
+  info :writing_table, {:ok, state_code, env} do
     """
     \nWriting table of weather observations for a state...
-    • State: #{code}
-    • State name: #{@state_names[code] || "???"}
+    • State: #{state_code}
+    • State name: #{@state_names[state_code] || "???"}
     #{from(env, __MODULE__)}\
     """
   end
 
-  info :writing_table, {:error, code, env} do
+  info :writing_table, {:error, state_code, env} do
     """
     \nWriting table of unresponsive stations for a state...
-    • State: #{code}
-    • State name: #{@state_names[code] || "???"}
+    • State: #{state_code}
+    • State name: #{@state_names[state_code] || "???"}
     #{from(env, __MODULE__)}\
     """
   end
@@ -33,41 +33,43 @@ defmodule NOAA.Observations.Log do
   end
 
   error :stations_not_fetched,
-        {state_code, state_url, error_code, error, env} do
+        {{state_code, state_url, env}, {error_code, error_text}} do
     """
     \nFailed to fetch the stations of a state...
     • URL: #{maybe_break(state_url, 7)}
     • State: #{state_code}
     • State name: #{@state_names[state_code] || "???"}
     • Error code: #{inspect(error_code)}
-    • Error: #{maybe_break(error, 9)}
+    • Error: #{maybe_break(error_text, 9)}
     #{from(env, __MODULE__)}\
     """
   end
 
-  info :observation_fetched, {id, name, code, url, env} do
+  info :observation_fetched,
+       {station_id, station_name, station_url, state_code, env} do
     """
     \nFetched the latest observation of a station...
-    • URL: #{maybe_break(url, 7)}
-    • Station: #{id}
-    • Station name: #{maybe_break(name, 16)}
-    • State: #{code}
-    • State name: #{@state_names[code] || "???"}
+    • URL: #{maybe_break(station_url, 7)}
+    • Station: #{station_id}
+    • Station name: #{maybe_break(station_name, 16)}
+    • State: #{state_code}
+    • State name: #{@state_names[state_code] || "???"}
     #{from(env, __MODULE__)}\
     """
   end
 
   error :observation_not_fetched,
-        {id, name, code, error_code, error, url, env} do
+        {{station_id, station_name, station_url, state_code, env},
+         {error_code, error_text}} do
     """
     \nFailed to fetch the latest observation of a station...
-    • URL: #{maybe_break(url, 7)}
-    • Station: #{id}
-    • Station name: #{maybe_break(name, 16)}
-    • State: #{code}
-    • State name: #{@state_names[code] || "???"}
+    • URL: #{maybe_break(station_url, 7)}
+    • Station: #{station_id}
+    • Station name: #{maybe_break(station_name, 16)}
+    • State: #{state_code}
+    • State name: #{@state_names[state_code] || "???"}
     • Error code: #{inspect(error_code)}
-    • Error: #{maybe_break(error, 9)}
+    • Error: #{maybe_break(error_text, 9)}
     #{from(env, __MODULE__)}\
     """
   end
@@ -84,7 +86,7 @@ defmodule NOAA.Observations.Log do
     """
   end
 
-  info :halting, {env} do
+  info :halting, env do
     """
     \nHalting the Erlang runtime system...
     #{from(env, __MODULE__)}\

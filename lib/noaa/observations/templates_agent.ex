@@ -8,14 +8,14 @@ defmodule NOAA.Observations.TemplatesAgent do
 
   alias __MODULE__
 
+  @templates get_env(:url_templates)
+
   @typedoc "URL"
   @type url :: String.t()
   @typedoc "URL template"
   @type template :: String.t()
   @typedoc "A map of state and station URL templates"
   @type templates :: %{state: template, station: template}
-
-  @templates get_env(:url_templates)
 
   @doc """
   Spawns an agent process that loads the state and station URL templates.

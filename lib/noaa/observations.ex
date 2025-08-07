@@ -16,6 +16,12 @@ defmodule NOAA.Observations do
   @timeout_spec get_env(:timeout_spec)
   @wait 300
 
+  @typedoc "A map of station observations/errors"
+  @type t :: %{
+          optional(:ok) => [Station.observation()],
+          optional(:error) => [Station.error()]
+        }
+
   @doc """
   Fetches weather observations for a `state_code`.
 
@@ -102,62 +108,59 @@ defmodule NOAA.Observations do
       iex> url
       "http://localhost:65535"
   """
-  @spec fetch(State.code(), Keyword.t()) ::
-          %{
-            optional(:ok) => [Station.observation()],
-            optional(:error) => [Station.error()]
-          }
-          | {:error, State.error()}
+  @spec fetch(State.code(), Keyword.t()) :: t | {:error, State.error()}
   def fetch(state_code, options \\ []) do
-    state_url = TemplatesAgent.state_url(state_code: state_code)
-
     case State.stations(state_code) do
       {:ok, stations} ->
-        await_timeout = await_timeout()
-
-        try do
-          stations
-          |> Enum.map(&Task.async(Station, :observation, [&1, state_code]))
-          # Default timeout is 5000 ms...
-          # |> Enum.map(&Task.await/1)
-          |> Enum.map(&Task.await(&1, await_timeout))
-          # [{:ok, obs1}, {:ok, obs2}...{:error, err1}, {:error, err2}...] ->
-          # %{ok: [obs1, obs2...], error: [err1, err2...]}
-          |> Enum.group_by(fn {k, _v} -> k end, fn {_k, v} -> v end)
-        catch
-          :exit, {:timeout, {Task, :await, [%Task{mfa: mfa}, timeout]}} ->
-            {mfa, function} = {inspect(mfa), fun(__ENV__)}
-            retries = RetriesAgent.get_and_decrement()
-
-            :ok =
-              Log.error(:timeout, {mfa, timeout, state_code, retries, __ENV__})
-
-            :ok = Message.timeout(state_code, retries)
-            map = %{mfa: mfa, timeout: timeout, function: function}
-            :ok = Table.write(@timeout_spec, [map], options)
-
-            if retries > 0 do
-              fetch(state_code, options)
-            else
-              :ok = Log.info(:halting, {__ENV__})
-              # Ensure messages logged before exiting...
-              :ok = Process.sleep(@wait)
-              System.halt()
-            end
-        end
+        await_timeout() |> _fetch(stations, state_code, options)
 
       {:error, error_code, error_text} ->
-        {:error,
-         %{
-           state_code: state_code,
-           state_name: @state_names[state_code],
-           error_code: error_code,
-           error_text: error_text,
-           state_url: state_url
-         }}
+        {:error, error({state_code, error_code, error_text})}
     end
   end
 
+  ## Private functions
+
   @spec await_timeout :: non_neg_integer
-  def await_timeout, do: get_env(:await_timeout)
+  defp await_timeout, do: get_env(:await_timeout)
+
+  @spec error({State.code(), any, String.t()}) :: State.error()
+  defp error({state_code, error_code, error_text}) do
+    %{
+      state_code: state_code,
+      state_name: @state_names[state_code],
+      state_url: TemplatesAgent.state_url(state_code: state_code),
+      error_code: error_code,
+      error_text: error_text
+    }
+  end
+
+  # TODO: get rid of retries agent...
+  defp _fetch(await_timeout, stations, state_code, options) do
+    try do
+      stations
+      |> Enum.map(&Task.async(Station, :observation, [&1, state_code]))
+      |> Enum.map(&Task.await(&1, await_timeout))
+      # [{:ok, obs1}, {:ok, obs2}...{:error, err1}, {:error, err2}...] ->
+      # %{ok: [obs1, obs2...], error: [err1, err2...]}
+      |> Enum.group_by(fn {k, _v} -> k end, fn {_k, v} -> v end)
+    catch
+      :exit, {:timeout, {Task, :await, [%Task{mfa: mfa}, timeout]}} ->
+        {mfa, function} = {inspect(mfa), fun(__ENV__)}
+        retries = RetriesAgent.get_and_decrement()
+        :ok = Log.error(:timeout, {mfa, timeout, state_code, retries, __ENV__})
+        :ok = Message.timeout(state_code, retries)
+        map = %{mfa: mfa, timeout: timeout, function: function}
+        :ok = Table.write(@timeout_spec, [map], options)
+
+        if retries > 0 do
+          _fetch(await_timeout, stations, state_code, options)
+        else
+          :ok = Log.info(:halting, __ENV__)
+          # Ensure messages logged before halting...
+          :ok = Process.sleep(@wait)
+          System.halt()
+        end
+    end
+  end
 end
