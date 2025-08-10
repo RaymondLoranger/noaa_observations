@@ -1,6 +1,7 @@
 defmodule NOAA.Observations.Help do
   @moduledoc """
-  Prints info on the escript command's usage and syntax.\s\s
+  Prints info on the escript command's usage and syntax.
+
   Reference https://dev.to/paulasantamaria/command-line-interfaces-structure-syntax-2533
   """
 

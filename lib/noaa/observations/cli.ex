@@ -22,8 +22,13 @@ defmodule NOAA.Observations.CLI do
   @default_switches get_env(:default_switches)
   @observations_spec get_env(:observations_spec)
   @parsing_options get_env(:parsing_options)
-  @state_spec get_env(:state_spec)
+  @state_error_spec get_env(:state_error_spec)
   @stations_spec get_env(:stations_spec)
+
+  @typedoc "NOAA weather observations"
+  @type observations :: [Station.observation()]
+  @typedoc "Station errors"
+  @type station_errors :: [Station.error()]
 
   @doc """
   Parses the command line and prints a table of weather observations from the
@@ -33,8 +38,8 @@ defmodule NOAA.Observations.CLI do
   usage and syntax. Otherwise it is a US state/territory code
   (case-insensitive) and optionally the number of observations
   to format (the first _n_ ones).
-  To format the last _n_ observations, specify switch `--last`.
 
+  To format the last _n_ observations, specify switch `--last`.
   To ring the bell, specify switch `--bell`.
   To choose a table style, specify switch `--table-style`.
 
@@ -90,7 +95,7 @@ defmodule NOAA.Observations.CLI do
 
   ## Private functions
 
-  @spec maybe_write_table(Keyword.t(), OptionParser.argv()) :: :ok
+  @spec maybe_write_table(keyword, OptionParser.argv()) :: :ok
   defp maybe_write_table(switches, [state_code]) do
     maybe_write_table(switches, [state_code, @default_count])
   end
@@ -104,7 +109,7 @@ defmodule NOAA.Observations.CLI do
          options = [count: count, bell: bell?, style: style] do
       :ok = String.upcase(state_code) |> write_table(options)
     else
-      _error -> :ok = Help.print_help()
+      :error -> :ok = Help.print_help()
     end
   end
 
@@ -113,49 +118,51 @@ defmodule NOAA.Observations.CLI do
   end
 
   @dialyzer {:nowarn_function, [write_table: 2]}
-  @spec write_table(State.code(), Keyword.t()) :: :ok
+  @spec write_table(State.code(), keyword) :: :ok
   defp write_table(state_code, options) do
     case Observations.fetch(state_code, options) do
-      %{ok: observations, error: errors} ->
-        :ok = write_table(:error, errors, hike_count(options), state_code)
-        :ok = write_table(:ok, observations, options, state_code)
+      %{ok: observations, error: station_errors} ->
+        :ok = write_stations_table(station_errors, adjust(options), state_code)
+        :ok = write_observations_table(observations, options, state_code)
 
       %{ok: observations} ->
-        :ok = write_table(:ok, observations, options, state_code)
+        :ok = write_observations_table(observations, options, state_code)
 
-      %{error: errors} when is_list(errors) ->
-        :ok = write_table(:error, errors, hike_count(options), state_code)
+      %{error: station_errors} ->
+        :ok = write_stations_table(station_errors, adjust(options), state_code)
 
-      {:error, error} ->
-        :ok = write_table(:error, error, options, state_code)
+      {:error, state_error} ->
+        :ok = write_state_error_table(state_error, options, state_code)
 
-      _empty_map_on_invalid_state_code ->
-        :ok = write_table(:ok, [], options, state_code)
+      %{} ->
+        :ok = write_observations_table([], options, state_code)
     end
   end
 
-  @dialyzer {:nowarn_function, [write_table: 4]}
-  @spec write_table(:error, [Station.error()], Keyword.t(), State.code()) :: :ok
-  defp write_table(:error, errors, options, state_code) when is_list(errors) do
-    :ok = Message.writing_table(:error, state_code)
-    :ok = Log.info(:writing_table, {:error, state_code, __ENV__})
-    :ok = Table.write(@stations_spec, errors, options)
+  @dialyzer {:nowarn_function, [write_stations_table: 3]}
+  @spec write_stations_table(station_errors, keyword, State.code()) :: :ok
+  defp write_stations_table(station_errors, options, state_code) do
+    :ok = Log.info(:writing_stations_table, {state_code, __ENV__})
+    :ok = Message.writing_stations_table(state_code)
+    :ok = Table.write(@stations_spec, station_errors, options)
   end
 
-  @spec write_table(:error, State.error(), Keyword.t(), State.code()) :: :ok
-  defp write_table(:error, error, options, state_code) do
-    :ok = Message.stations_not_fetched(state_code)
-    :ok = Table.write(@state_spec, [error], options)
+  @dialyzer {:nowarn_function, [write_state_error_table: 3]}
+  @spec write_state_error_table(State.error(), keyword, State.code()) :: :ok
+  defp write_state_error_table(state_error, options, state_code) do
+    :ok = Log.info(:writing_state_error_table, {state_error, __ENV__})
+    :ok = Message.writing_state_error_table(state_code)
+    :ok = Table.write(@state_error_spec, [state_error], options)
   end
 
-  @spec write_table(:ok, [Station.observation()], Keyword.t(), State.code()) ::
-          :ok
-  defp write_table(:ok, observations, options, state_code) do
-    :ok = Message.writing_table(:ok, state_code)
-    :ok = Log.info(:writing_table, {:ok, state_code, __ENV__})
+  @dialyzer {:nowarn_function, [write_observations_table: 3]}
+  @spec write_observations_table(observations, keyword, State.code()) :: :ok
+  defp write_observations_table(observations, options, state_code) do
+    :ok = Log.info(:writing_observations_table, {state_code, __ENV__})
+    :ok = Message.writing_observations_table(state_code)
     :ok = Table.write(@observations_spec, observations, options)
   end
 
-  @spec hike_count(keyword) :: keyword
-  defp hike_count(options), do: put_in(options[:count], 999)
+  @spec adjust(keyword) :: keyword
+  defp adjust(options), do: put_in(options[:count], 999)
 end

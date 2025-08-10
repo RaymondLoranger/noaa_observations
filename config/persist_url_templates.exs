@@ -9,6 +9,7 @@ station_query = "stid=<%=station_id%>"
 
 config :noaa_observations,
   url_templates: %{
+    # state: "http://localhost:65535",
     state: "#{scheme}://#{host}#{state_path}?#{state_query}",
     station: "#{scheme}://#{host}#{station_path}?#{station_query}"
   }

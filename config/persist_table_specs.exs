@@ -71,7 +71,7 @@ options = [
 ]
 
 config :noaa_observations,
-  state_spec: Spec.new(headers, options) |> Spec.develop()
+  state_error_spec: Spec.new(headers, options) |> Spec.develop()
 
 # ┌────────────────────────────┐
 # │ ••• Timeout table spec ••• │

@@ -6,7 +6,7 @@ defmodule NOAA.Observations.Message do
 
   @observations_spec get_env(:observations_spec)
   @state_names get_env(:state_names)
-  @state_spec get_env(:state_spec)
+  @state_error_spec get_env(:state_error_spec)
   @stations_spec get_env(:stations_spec)
   @timeout_spec get_env(:timeout_spec)
 
@@ -38,46 +38,60 @@ defmodule NOAA.Observations.Message do
   def error(:formerror), do: "Format Error"
   def error(reason), do: "Reason => #{inspect(reason)}"
 
-  @spec writing_table(:ok | :error, State.code()) :: :ok
-  def writing_table(:ok, code) do
+  @spec writing_observations_table(State.code()) :: :ok
+  def writing_observations_table(state_code) do
     [
       @observations_spec.left_margin,
       [:white, "Writing table of weather observations for "],
-      [:light_white, "#{@state_names[code] || "???"}"],
+      [:light_white, state_name(state_code)],
       [:white, "..."]
     ]
     |> ANSI.puts()
   end
 
-  def writing_table(:error, code) do
+  @spec writing_stations_table(State.code()) :: :ok
+  def writing_stations_table(state_code) do
     [
       @stations_spec.left_margin,
       [:white, "Writing table of unresponsive stations for "],
-      [:light_white, "#{@state_names[code] || "???"}"],
+      [:light_white, state_name(state_code)],
       [:white, "..."]
     ]
     |> ANSI.puts()
   end
 
-  @spec stations_not_fetched(State.code()) :: :ok
-  def stations_not_fetched(code) do
+  @spec writing_state_error_table(State.code()) :: :ok
+  def writing_state_error_table(state_code) do
     [
-      @state_spec.left_margin,
-      [:white, "Failed to fetch the stations of "],
-      [:light_white, "#{@state_names[code] || "???"}"],
+      @state_error_spec.left_margin,
+      [:white, "Writing table of state error for "],
+      [:light_white, state_name(state_code)],
       [:white, "..."]
     ]
     |> ANSI.puts()
   end
 
-  @spec timeout(State.code(), non_neg_integer) :: :ok
-  def timeout(state_code, left) do
+  @spec writing_timeout_table(State.code(), non_neg_integer) :: :ok
+  def writing_timeout_table(state_code, fetches_left) do
     [
       @timeout_spec.left_margin,
-      [:white, "Timeout while fetching observations for "],
-      [:light_white, "#{@state_names[state_code] || "???"}"],
-      [:white, "... #{(left > 0 && "Trying again...") || "Halting..."}"]
+      [:white, "Writing table of fetch timeout for "],
+      [:light_white, state_name(state_code)],
+      [:white, "... " <> suffix(fetches_left)]
     ]
     |> ANSI.puts()
   end
+
+  # NOAA.Observations.Message.state_name("DC") => "District of Columbia"
+  # NOAA.Observations.Message.state_name("DD") => "???"
+  @spec state_name(State.code()) :: String.t()
+  def state_name(state_code) do
+    "#{@state_names[state_code] || "???"}"
+  end
+
+  ## Private functions
+
+  @spec suffix(non_neg_integer) :: String.t()
+  defp suffix(0), do: "Halting..."
+  defp suffix(_), do: "Trying again..."
 end

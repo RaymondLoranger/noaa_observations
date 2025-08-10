@@ -1,13 +1,13 @@
 defmodule NOAA.Observations.State do
   @moduledoc """
-  Fetches the stations for a US state/territory code.
+  Fetches the stations of a US state/territory.
   """
 
   alias NOAA.Observations.{Log, Message, Station, TemplatesAgent}
 
   @typedoc "US state/territory code"
   @type code :: <<_::16>>
-  @typedoc "Erroneous state"
+  @typedoc "State error map"
   @type error :: map
 
   @doc """
@@ -22,7 +22,7 @@ defmodule NOAA.Observations.State do
   ## Examples
 
       iex> alias NOAA.Observations.{State, TemplatesAgent}
-      iex> :ok = TemplatesAgent.refresh()
+      iex> :ok = TemplatesAgent.reset()
       iex> {:ok, stations} = State.stations("VT")
       iex> %{"KFSO" => name} = Map.new(stations)
       iex> name

@@ -38,7 +38,7 @@ defmodule NOAA.Observations.TemplatesAgent do
   ## Examples
 
       iex> alias NOAA.Observations.TemplatesAgent
-      iex> TemplatesAgent.refresh()
+      iex> TemplatesAgent.reset()
       iex> TemplatesAgent.state_url(state_code: "VT")
       "https://forecast.weather.gov/xml/current_obs/seek.php?state=VT&Find=Find"
 
@@ -59,7 +59,7 @@ defmodule NOAA.Observations.TemplatesAgent do
   ## Examples
 
       iex> alias NOAA.Observations.TemplatesAgent
-      iex> TemplatesAgent.refresh()
+      iex> TemplatesAgent.reset()
       iex> TemplatesAgent.station_url(station_id: "KFSO")
       "https://forecast.weather.gov/xml/current_obs/display.php?stid=KFSO"
 
@@ -107,11 +107,10 @@ defmodule NOAA.Observations.TemplatesAgent do
   end
 
   @doc """
-  Refreshes the agent state.
+  Resets the agent state.
   """
-  @spec refresh :: :ok
-  # def refresh, do: Agent.update(TemplatesAgent, fn _templates -> @templates end)
-  def refresh, do: Agent.update(TemplatesAgent, &templates/1)
+  @spec reset :: :ok
+  def reset, do: Agent.update(TemplatesAgent, &templates/1)
 
   ## Private functions
 

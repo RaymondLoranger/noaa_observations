@@ -1,6 +1,6 @@
 defmodule NOAA.Observations.Station do
   @moduledoc """
-  Fetches the latest observation for a given NOAA station.
+  Fetches the latest observation of a given NOAA station.
   """
 
   alias NOAA.Observations.{Log, Message, State, TemplatesAgent}
@@ -11,13 +11,13 @@ defmodule NOAA.Observations.Station do
   @type name :: String.t()
   @typedoc "NOAA weather observation"
   @type observation :: map
-  @typedoc "Erroneous station"
+  @typedoc "Station error"
   @type error :: map
   @typedoc "NOAA station"
   @type t :: {id, name}
 
   @doc """
-  Fetches the latest observation for a given NOAA `station`.
+  Fetches the latest observation of a given NOAA `station`.
 
   Returns either tuple `{:ok, observation}` or tuple `{:error, error}`.
 
@@ -29,7 +29,7 @@ defmodule NOAA.Observations.Station do
   ## Examples
 
       iex> alias NOAA.Observations.{Station, TemplatesAgent}
-      iex> :ok = TemplatesAgent.refresh()
+      iex> :ok = TemplatesAgent.reset()
       iex> {:ok, observation} =
       ...>   Station.observation({"KFSO", "KFSO name"}, "VT")
       iex> is_map(observation) and is_binary(observation["wind_mph"])
@@ -68,14 +68,14 @@ defmodule NOAA.Observations.Station do
       {:ok, %HTTPoison.Response{status_code: status_code}} ->
         error_text = Message.status(status_code)
         args = {args, {status_code, error_text}}
-        :ok = Log.error(:observation_not_fetched, args)
-        {:error, _error(args)}
+        :ok = Log.warning(:observation_not_fetched, args)
+        {:error, _station_error(args)}
 
       {:error, %HTTPoison.Error{reason: reason}} ->
         error_text = Message.error(reason)
         args = {args, {reason, error_text}}
-        :ok = Log.error(:observation_not_fetched, args)
-        {:error, _error(args)}
+        :ok = Log.warning(:observation_not_fetched, args)
+        {:error, _station_error(args)}
     end
   end
 
@@ -92,8 +92,8 @@ defmodule NOAA.Observations.Station do
     |> Map.new(&List.to_tuple/1)
   end
 
-  @spec _error(tuple) :: error
-  defp _error(
+  @spec _station_error(tuple) :: error
+  defp _station_error(
          {{station_id, station_name, station_url, _state_code, _env},
           {error_code, error_text}}
        ) do
