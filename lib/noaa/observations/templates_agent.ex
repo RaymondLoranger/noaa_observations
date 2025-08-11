@@ -38,13 +38,13 @@ defmodule NOAA.Observations.TemplatesAgent do
   ## Examples
 
       iex> alias NOAA.Observations.TemplatesAgent
-      iex> TemplatesAgent.reset()
+      iex> :ok = TemplatesAgent.reset()
       iex> TemplatesAgent.state_url(state_code: "VT")
       "https://forecast.weather.gov/xml/current_obs/seek.php?state=VT&Find=Find"
 
       iex> alias NOAA.Observations.TemplatesAgent
       iex> template = "http://noaa.gov/seek.php?state=<%=state_abbr%>&Find=Find"
-      iex> TemplatesAgent.update_state_template(template)
+      iex> :ok = TemplatesAgent.update_state_template(template)
       iex> TemplatesAgent.state_url(state_abbr: "NY")
       "http://noaa.gov/seek.php?state=NY&Find=Find"
   """
@@ -59,13 +59,13 @@ defmodule NOAA.Observations.TemplatesAgent do
   ## Examples
 
       iex> alias NOAA.Observations.TemplatesAgent
-      iex> TemplatesAgent.reset()
+      iex> :ok = TemplatesAgent.reset()
       iex> TemplatesAgent.station_url(station_id: "KFSO")
       "https://forecast.weather.gov/xml/current_obs/display.php?stid=KFSO"
 
       iex> alias NOAA.Observations.TemplatesAgent
       iex> template = "http://noaa.gov/display.php?stid=<%=stn_id%>"
-      iex> TemplatesAgent.update_station_template(template)
+      iex> :ok = TemplatesAgent.update_station_template(template)
       iex> TemplatesAgent.station_url(stn_id: "KBTV")
       "http://noaa.gov/display.php?stid=KBTV"
   """
@@ -81,13 +81,13 @@ defmodule NOAA.Observations.TemplatesAgent do
 
       iex> alias NOAA.Observations.TemplatesAgent
       iex> template = "http://noaa.gov/seek.php?state=<%=state_code%>&Find=Find"
-      iex> TemplatesAgent.update_state_template(template)
+      iex> :ok = TemplatesAgent.update_state_template(template)
       iex> Agent.get(TemplatesAgent, & &1.state) == template
       true
   """
   @spec update_state_template(template) :: :ok
   def update_state_template(template) when is_binary(template) do
-    Agent.update(TemplatesAgent, &%{&1 | state: template})
+    :ok = Agent.update(TemplatesAgent, &%{&1 | state: template})
   end
 
   @doc """
@@ -97,20 +97,20 @@ defmodule NOAA.Observations.TemplatesAgent do
 
       iex> alias NOAA.Observations.TemplatesAgent
       iex> template = "http://noaa.gov/display.php?stid=<%=station_id%>"
-      iex> TemplatesAgent.update_station_template(template)
+      iex> :ok = TemplatesAgent.update_station_template(template)
       iex> Agent.get(TemplatesAgent, & &1.station) == template
       true
   """
   @spec update_station_template(template) :: :ok
   def update_station_template(template) when is_binary(template) do
-    Agent.update(TemplatesAgent, &%{&1 | station: template})
+    :ok = Agent.update(TemplatesAgent, &%{&1 | station: template})
   end
 
   @doc """
   Resets the agent state.
   """
   @spec reset :: :ok
-  def reset, do: Agent.update(TemplatesAgent, &templates/1)
+  def reset, do: :ok = Agent.update(TemplatesAgent, &templates/1)
 
   ## Private functions
 

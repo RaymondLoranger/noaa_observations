@@ -13,6 +13,8 @@ defmodule NOAA.Observations.Station do
   @type observation :: map
   @typedoc "Station error"
   @type error :: map
+  @typedoc "Station timeout"
+  @type time_out :: map
   @typedoc "NOAA station"
   @type t :: {id, name}
 
@@ -39,21 +41,21 @@ defmodule NOAA.Observations.Station do
       iex> template =
       ...>   "htp://forecast.weather.gov/xml/current_obs" <>
       ...>     "/display.php?stid=<%=station_id%>"
-      iex> TemplatesAgent.update_station_template(template)
-      iex> {:error, %{error_text: text, error_code: code, station_id: id}} =
+      iex> :ok = TemplatesAgent.update_station_template(template)
+      iex> {:error, %{station_id: id, error_code: code, error_text: text}} =
       ...>   Station.observation({"KFSO", "KFSO name"}, "VT")
-      iex> {text, code, id}
-      {"Non-Existent Domain", :nxdomain, "KFSO"}
+      iex> {id, code, text}
+      {"KFSO", :nxdomain, "Non-Existent Domain"}
 
       iex> alias NOAA.Observations.{Station, TemplatesAgent}
       iex> template =
       ...>   "https://forecast.weather.gov/xml/past_obs" <>
       ...>     "/display.php?stid=<%=station_id%>"
-      iex> TemplatesAgent.update_station_template(template)
-      iex> {:error, %{error_text: text, error_code: code, station_id: id}} =
+      iex> :ok = TemplatesAgent.update_station_template(template)
+      iex> {:error, %{station_id: id, error_code: code, error_text: text}} =
       ...>   Station.observation({"KFSO", "KFSO name"}, "VT")
-      iex> {text, code, id}
-      {"Not Found", 404, "KFSO"}
+      iex> {id, code, text}
+      {"KFSO", 404, "Not Found"}
   """
   @spec observation(t, State.code()) :: {:ok, observation} | {:error, error}
   def observation({station_id, station_name} = _station, state_code) do

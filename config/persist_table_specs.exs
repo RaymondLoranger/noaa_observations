@@ -22,7 +22,7 @@ options = [
   header_fixes: %{
     ~r[ mph$]i => " MPH",
     "Temperature String" => "Temperature",
-    "Visibility Mi" => "Vis mi",
+    "Visibility Mi" => "Vis (mi)",
     "Station Id" => "Stn"
   },
   sort_specs: [desc: "temperature_string", asc: "wind_mph"],
@@ -77,13 +77,13 @@ config :noaa_observations,
 # │ ••• Timeout table spec ••• │
 # └────────────────────────────┘
 
-headers = ~W[mfa timeout function]a
+headers = ~W[mfa timeout function attempts attempt_limit]a
 
 options = [
-  align_specs: [right: :timeout],
+  align_specs: [right: :timeout, right: :attempts, right: :attempt_limit],
   header_fixes: %{
     "Mfa" => "MFA {module, function, arity}",
-    "Timeout" => "Timeout ms"
+    "Timeout" => "Timeout (ms)"
   },
   margins: [top: 0, bottom: 0, left: 1]
 ]

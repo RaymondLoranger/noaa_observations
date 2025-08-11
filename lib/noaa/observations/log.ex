@@ -40,6 +40,15 @@ defmodule NOAA.Observations.Log do
     """
   end
 
+  info :writing_timeout_table, {state_code, env} do
+    """
+    \nWriting table of fetch timeouts for a state...
+    • State: #{state_code}
+    • State name: #{Message.state_name(state_code)}
+    #{from(env, __MODULE__)}\
+    """
+  end
+
   info :stations_fetched, {state_code, state_url, env} do
     """
     \nFetched the stations of a state...
@@ -51,7 +60,7 @@ defmodule NOAA.Observations.Log do
   end
 
   error :stations_not_fetched,
-        {{state_code, state_url, env}, {error_code, error_text}} do
+        {{state_code, state_url, env}, error_code, error_text} do
     """
     \nFailed to fetch the stations of a state...
     • State: #{state_code}
@@ -92,24 +101,26 @@ defmodule NOAA.Observations.Log do
     """
   end
 
-  warning :writing_timeout_table,
-          {%{mfa: mfa, timeout: timeout, function: function},
-           {state_code, left, env}} do
+  warning :timeout,
+          {%{
+             timeout: [
+               %{
+                 mfa: mfa,
+                 timeout: timeout,
+                 function: _function,
+                 attempts: attempts,
+                 attempt_limit: attempt_limit
+               }
+             ]
+           } = _time_group, state_code, env} do
     """
-    \nWriting table of fetch timeout for a state...
+    \nTimeout while fetching observations for a state...
     • State: #{state_code}
     • State name: #{Message.state_name(state_code)}
     • MFA: #{maybe_break(mfa, 7)}
-    • Function: #{function}
     • Timeout: #{timeout} ms
-    • Attempts left: #{left}
-    #{from(env, __MODULE__)}\
-    """
-  end
-
-  error :halting, env do
-    """
-    \nHalting the Erlang runtime system...
+    • Attempt number: #{attempts}
+    • Attempt limit: #{attempt_limit}
     #{from(env, __MODULE__)}\
     """
   end

@@ -71,13 +71,13 @@ defmodule NOAA.Observations.Message do
     |> ANSI.puts()
   end
 
-  @spec writing_timeout_table(State.code(), non_neg_integer) :: :ok
-  def writing_timeout_table(state_code, fetches_left) do
+  @spec writing_timeout_table(State.code()) :: :ok
+  def writing_timeout_table(state_code) do
     [
       @timeout_spec.left_margin,
-      [:white, "Writing table of fetch timeout for "],
+      [:white, "Writing table of fetch timeouts for "],
       [:light_white, state_name(state_code)],
-      [:white, "... " <> suffix(fetches_left)]
+      [:white, "..."]
     ]
     |> ANSI.puts()
   end
@@ -88,10 +88,4 @@ defmodule NOAA.Observations.Message do
   def state_name(state_code) do
     "#{@state_names[state_code] || "???"}"
   end
-
-  ## Private functions
-
-  @spec suffix(non_neg_integer) :: String.t()
-  defp suffix(0), do: "Halting..."
-  defp suffix(_), do: "Trying again..."
 end

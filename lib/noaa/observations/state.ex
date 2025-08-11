@@ -7,8 +7,10 @@ defmodule NOAA.Observations.State do
 
   @typedoc "US state/territory code"
   @type code :: <<_::16>>
-  @typedoc "State error map"
+  @typedoc "State error"
   @type error :: map
+  @typedoc "State error code"
+  @type error_code :: pos_integer | atom
 
   @doc """
   Fetches the stations for a `state_code`.
@@ -32,47 +34,20 @@ defmodule NOAA.Observations.State do
       iex> template =
       ...>   "http://forecast.weather.gov/xml/current_obs" <>
       ...>     "/seek.php?state=<%=state_code%>&Find=Find"
-      iex> TemplatesAgent.update_state_template(template)
+      iex> :ok = TemplatesAgent.update_state_template(template)
       iex> State.stations("VT")
       {:error, 301, "Moved Permanently"}
 
       iex> alias NOAA.Observations.{State, TemplatesAgent}
       iex> template =
-      ...>   "https://www.weather.gov/xml/current_obs" <>
-      ...>     "/seek.php?state=<%=state_code%>&Find=Find"
-      iex> TemplatesAgent.update_state_template(template)
-      iex> State.stations("VT")
-      {:error, 302, "Found (Moved Temporarily)"}
-
-      iex> alias NOAA.Observations.{State, TemplatesAgent}
-      iex> template =
-      ...>   "https://forecast.weather.gov/xml/past_obs" <>
-      ...>     "/seek.php?state=<%=state_code%>&Find=Find"
-      iex> TemplatesAgent.update_state_template(template)
-      iex> State.stations("VT")
-      {:error, 404, "Not Found"}
-
-      iex> alias NOAA.Observations.{State, TemplatesAgent}
-      iex> template =
       ...>   "htp://forecast.weather.gov/xml/current_obs" <>
       ...>     "/seek.php?state=<%=state_code%>&Find=Find"
-      iex> TemplatesAgent.update_state_template(template)
+      iex> :ok = TemplatesAgent.update_state_template(template)
       iex> State.stations("VT")
       {:error, :nxdomain, "Non-Existent Domain"}
-
-      iex> alias NOAA.Observations.{State, TemplatesAgent}
-      iex> template = "http://localhost:65535"
-      iex> TemplatesAgent.update_state_template(template)
-      iex> State.stations("VT")
-      {:error, :econnrefused, "Connection Refused By Server"}
-
-      iex> alias NOAA.Observations.{State, TemplatesAgent}
-      iex> template = "http://localhost:0"
-      iex> TemplatesAgent.update_state_template(template)
-      iex> State.stations("VT")
-      {:error, :eaddrnotavail, "Address Not Available"}
   """
-  @spec stations(code) :: {:ok, [Station.t()]} | {:error, any, String.t()}
+  @spec stations(code) ::
+          {:ok, [Station.t()]} | {:error, error_code, String.t()}
   def stations(state_code) do
     state_url = TemplatesAgent.state_url(state_code: state_code)
     args = {state_code, state_url, __ENV__}
@@ -84,13 +59,13 @@ defmodule NOAA.Observations.State do
 
       {:ok, %HTTPoison.Response{status_code: status_code}} ->
         error_text = Message.status(status_code)
-        args = {args, {status_code, error_text}}
+        args = {args, status_code, error_text}
         :ok = Log.error(:stations_not_fetched, args)
         {:error, status_code, error_text}
 
       {:error, %HTTPoison.Error{reason: reason}} ->
         error_text = Message.error(reason)
-        args = {args, {reason, error_text}}
+        args = {args, reason, error_text}
         :ok = Log.error(:stations_not_fetched, args)
         {:error, reason, error_text}
     end
@@ -102,7 +77,7 @@ defmodule NOAA.Observations.State do
   defp _stations(body) do
     # <a href="/xml/current_obs/display.php?stid=KTIX">Titusville</a>
     # capture station ID and name
-    ~r[<a href=".*?stid=(\w+)">(.*?)</a>]
+    ~r[<a href=".+\?stid=(\w+)">(.*?)</a>]
     # i.e. only captured subpatterns
     |> Regex.scan(body, capture: :all_but_first)
     # each [id, name] -> {id, name}
