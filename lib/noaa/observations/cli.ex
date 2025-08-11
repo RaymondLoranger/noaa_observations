@@ -15,16 +15,11 @@ defmodule NOAA.Observations.CLI do
 
   alias IO.ANSI.Table.Style
   alias NOAA.Observations
-  alias NOAA.Observations.{Help, Station, TableWriter}
+  alias NOAA.Observations.{Help, TableWriter}
 
   @default_count get_env(:default_count)
   @default_switches get_env(:default_switches)
   @parsing_options get_env(:parsing_options)
-
-  @typedoc "NOAA weather observations"
-  @type observations :: [Station.observation()]
-  @typedoc "Station errors"
-  @type station_errors :: [Station.error()]
 
   @doc """
   Parses the command line and prints a table of weather observations from the
