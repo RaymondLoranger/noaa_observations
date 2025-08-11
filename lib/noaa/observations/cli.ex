@@ -6,7 +6,7 @@ defmodule NOAA.Observations.CLI do
   Parses the command line and prints a table of weather observations from the
   NOAA Weather Service.
 
-  ##### Exercise in the book [Programming Elixir](https://pragprog.com/book/elixir16/programming-elixir-1-6) by Dave Thomas.
+  ##### Exercise in the book [Programming Elixir](https://pragprog.com/titles/elixir16/programming-elixir-1-6) by Dave Thomas.
 
   ##### Reference https://dev.to/paulasantamaria/command-line-interfaces-structure-syntax-2533
   """

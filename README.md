@@ -2,7 +2,7 @@
 
 Writes NOAA Observations to `:stdio` in a table with borders and colors.
 
-##### Exercise in the book [Programming Elixir](https://pragprog.com/book/elixir16/programming-elixir-1-6) by Dave Thomas.
+##### Exercise in the book [Programming Elixir](https://pragprog.com/titles/elixir16/programming-elixir-1-6) by Dave Thomas.
 
 ## Usage
 
@@ -25,7 +25,9 @@ no ny 9 --last --table-style=dark
 ```
 
 ## Note
+
 You can click on the image below for a clearer view.
 
 ## Examples
+
 ## ![examples](images/examples.png)
