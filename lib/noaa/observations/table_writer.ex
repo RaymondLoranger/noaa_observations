@@ -2,7 +2,7 @@ defmodule NOAA.Observations.TableWriter do
   @moduledoc """
   Prints a table of weather observations from the NOAA Weather Service.
 
-  May also print error tables (state error or station errors/timeout).
+  May also print error tables (state error or station errors/timeouts).
   """
 
   use PersistConfig
@@ -18,12 +18,12 @@ defmodule NOAA.Observations.TableWriter do
 
   @type groups :: Observations.groups()
 
-  @spec write_table({:error, State.error()}, State.code(), keyword) :: :ok
+  @spec write_table(groups | {:error, State.error()}, State.code(), keyword) ::
+          :ok
   def write_table({:error, state_error}, state_code, options) do
     :ok = write_state_error_table(state_error, state_code, options)
   end
 
-  @spec write_table(groups, State.code(), keyword) :: :ok
   def write_table(groups, state_code, options) do
     :ok = write_timeout_table(groups, state_code, options)
     :ok = write_stations_table(groups, state_code, adjust(options))

@@ -13,13 +13,13 @@ defmodule NOAA.Observations do
 
   @fetches_max get_env(:fetches_max)
 
-  @typedoc "Groups of station observations/errors/timeout"
+  @typedoc "Groups of station observations/errors/timeouts"
   @type groups :: %{
           optional(:ok) => [Station.observation()],
           optional(:error) => [Station.error()],
           optional(:timeout) => [Station.time_out()]
         }
-  @typedoc "Group of station timeout"
+  @typedoc "Group of station timeouts"
   @type timeout_group :: %{optional(:timeout) => [Station.time_out()]}
 
   @doc """
