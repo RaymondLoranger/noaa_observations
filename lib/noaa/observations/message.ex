@@ -28,7 +28,7 @@ defmodule NOAA.Observations.Message do
   def status(504), do: "Gateway Timeout"
   def status(code), do: "Status code #{code}"
 
-  @spec error(term) :: String.t()
+  @spec error(atom) :: String.t()
   def error(:nxdomain), do: "Non-Existent Domain"
   def error(:econnrefused), do: "Connection Refused By Server"
   def error(:eaddrnotavail), do: "Address Not Available"

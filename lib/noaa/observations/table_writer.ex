@@ -20,6 +20,8 @@ defmodule NOAA.Observations.TableWriter do
 
   @spec write_table(groups | {:error, State.error()}, State.code(), keyword) ::
           :ok
+  def write_table(groups_or_error_tuple, state_code, options)
+
   def write_table({:error, state_error}, state_code, options) do
     :ok = write_state_error_table(state_error, state_code, options)
   end
