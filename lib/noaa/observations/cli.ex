@@ -25,13 +25,12 @@ defmodule NOAA.Observations.CLI do
   Parses the command line and prints a table of weather observations from the
   NOAA Weather Service.
 
-  `argv` can be "-h" or "--help", which prints info on the command's
-  usage and syntax. Otherwise it is a US state/territory code
-  (case-insensitive) and optionally the number of observations
-  to format (the first _n_ ones).
+  `argv` can be "-h" or "--help", which prints info on the command's usage and
+  syntax. Otherwise it is a US state/territory code (case-insensitive) and
+  optionally the number of observations to format (the first _n_ ones).
 
-  To format the last _n_ observations, specify switch `--last`.
-  To ring the bell, specify switch `--bell`.
+  To format the last _n_ observations, specify switch `--last`.\s\s
+  To ring the bell, specify switch `--bell`.\s\s
   To choose a table style, specify switch `--table-style`.
 
   ## Parameters
@@ -74,9 +73,9 @@ defmodule NOAA.Observations.CLI do
 
   ## Examples
 
-      $env:MIX_ENV="test"; mix run -e 'NOAA.Observations.CLI.main()'
-      $env:MIX_ENV="dev"; mix run -e 'NOAA.Observations.CLI.main()'
-      $env:MIX_ENV="prod"; mix run -e 'NOAA.Observations.CLI.main()'
+      $env:MIX_ENV="test";      mix run -e 'NOAA.Observations.CLI.main()'
+      $env:MIX_ENV="dev";       mix run -e 'NOAA.Observations.CLI.main()'
+      $env:MIX_ENV="prod";      mix run -e 'NOAA.Observations.CLI.main()'
       $env:AWAIT_TIMEOUT="111"; mix run -e 'NOAA.Observations.CLI.main()'
   """
   @spec main :: :ok
@@ -95,14 +94,14 @@ defmodule NOAA.Observations.CLI do
     with %{help: false, bell: bell?, last: last?, table_style: style} <-
            Map.merge(@default_switches, Map.new(switches)),
          {:ok, style} <- Style.from_switch_arg(style),
-         {count, ""} when count > 0 <- Integer.parse(count),
-         count = if(last?, do: -count, else: count),
-         options = [count: count, bell: bell?, style: style],
-         state_code = String.upcase(state_code),
-         observations = Observations.fetch(state_code) do
+         {count, ""} when count > 0 <- Integer.parse(count) do
+      count = if(last?, do: -count, else: count)
+      options = [count: count, bell: bell?, style: style]
+      state_code = String.upcase(state_code)
+      observations = Observations.fetch(state_code)
       :ok = TableWriter.write_table(observations, state_code, options)
     else
-      :error -> :ok = Help.print_help()
+      _error -> :ok = Help.print_help()
     end
   end
 
